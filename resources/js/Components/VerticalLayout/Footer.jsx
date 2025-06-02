@@ -1,5 +1,5 @@
-import React from "react";
-import { Container, Row, Col } from "reactstrap";
+import React from "react"
+import { Container, Row, Col } from "reactstrap"
 
 const Footer = () => {
   return (
@@ -12,12 +12,12 @@ const Footer = () => {
               <div className="text-sm-end d-none d-sm-block">
                 Design & Develop by Themesbrand
               </div>
-            </Col>
+            </Col>  
           </Row>
         </Container>
       </footer>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer

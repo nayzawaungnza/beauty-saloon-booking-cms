@@ -45,5 +45,28 @@ export const menuItems = [
       },
     ],
   },
+
+  {
+    id: "users",
+    label: "User",
+    icon: "mdi mdi-email-outline",
+    link: "#",
+    subItems: [
+      {
+        id: "user-list",
+        label: "Users List",
+        link: "/admin/users",
+        parentId: "user",
+      },
+      {
+        id: "add-new-user",
+        label: "Add New",
+        link: "/admin/users/create",
+        parentId: "users",
+      },
+      
+    ],
+  },
+
   // Add more menu items as needed...
 ];

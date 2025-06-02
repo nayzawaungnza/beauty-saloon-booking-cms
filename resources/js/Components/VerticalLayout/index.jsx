@@ -1,132 +1,141 @@
-"use client"
-
-import React, { useEffect, useCallback } from "react"
-import { usePage } from "@inertiajs/react"
+import PropTypes from "prop-types";
+import React, { useEffect } from "react";
+//import withRouter from "../Common/withRouter";
+import {
+  changeLayout,
+  changeLayoutMode,
+  changeSidebarTheme,
+  changeSidebarThemeImage,
+  changeSidebarType,
+  changeTopbarTheme,
+  changeLayoutWidth,
+  showRightSidebarAction,
+} from "@/store/actions";
 
 // Layout Related Components
-import Header from "./Header"
-import Sidebar from "./Sidebar"
-import Footer from "./Footer"
-import RightSidebar from "@/Components/CommonForBoth/RightSidebar"
+import Header from "./Header";
+import Sidebar from "./Sidebar";
+import Footer from "./Footer";
+import RightSidebar from "../CommonForBoth/RightSidebar";
 
-// Layout Context
-import { LayoutProvider, useLayout, leftSidebarTypes } from "@/Contexts/LayoutContext"
+//redux
+import { useSelector, useDispatch } from "react-redux";
+import { createSelector } from 'reselect';
 
-const LayoutContent = ({ children }) => {
+const Layout = (props) => {
+  const dispatch = useDispatch();
+
+  const selectLayoutProperties = createSelector(
+    (state) => state.Layout,
+    (layout) => ({
+      isPreloader: layout.isPreloader,
+      layoutModeType: layout.layoutModeType,
+      leftSideBarThemeImage: layout.leftSideBarThemeImage,
+      leftSideBarType: layout.leftSideBarType,
+      layoutWidth: layout.layoutWidth,
+      topbarTheme: layout.topbarTheme,
+      showRightSidebar: layout.showRightSidebar,
+      leftSideBarTheme: layout.leftSideBarTheme,
+    }));
+
   const {
     isPreloader,
-    leftSideBarTheme,
+    leftSideBarThemeImage,
+    layoutWidth,
     leftSideBarType,
+    topbarTheme,
     showRightSidebar,
-    isMobile,
-    changeSidebarType,
-    showRightSidebarAction,
-    changeLayout,
-  } = useLayout()
+    leftSideBarTheme,
+    layoutModeType
+  } = useSelector(selectLayoutProperties);
 
-  const { url } = usePage()
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  // Toggle menu callback with animation fix
-  const toggleMenuCallback = useCallback(() => {
-    const sidebar = document.getElementById("sidebar")
-    const body = document.body
-
-    if (leftSideBarType === leftSidebarTypes.DEFAULT) {
-      changeSidebarType(leftSidebarTypes.CONDENSED)
-      body.classList.add("sidebar-enable")
-      body.classList.add("vertical-collpsed")
-
-      // Add animation class
-      if (sidebar) {
-        sidebar.classList.add("sidebar-animating")
-        setTimeout(() => {
-          sidebar.classList.remove("sidebar-animating")
-        }, 300)
-      }
-    } else if (leftSideBarType === leftSidebarTypes.CONDENSED) {
-      changeSidebarType(leftSidebarTypes.DEFAULT)
-      body.classList.remove("sidebar-enable")
-      body.classList.remove("vertical-collpsed")
-
-      // Add animation class
-      if (sidebar) {
-        sidebar.classList.add("sidebar-animating")
-        setTimeout(() => {
-          sidebar.classList.remove("sidebar-animating")
-        }, 300)
-      }
+  const toggleMenuCallback = () => {
+    if (leftSideBarType === "default") {
+      dispatch(changeSidebarType("condensed", isMobile));
+    } else if (leftSideBarType === "condensed") {
+      dispatch(changeSidebarType("default", isMobile));
     }
-  }, [leftSideBarType, changeSidebarType])
+  };
 
-  // Hide right sidebar on body click
-  const hideRightbar = useCallback(
-    (event) => {
-      const rightbar = document.getElementById("right-bar")
-      const rightbarToggle = document.querySelector(".right-bar-toggle")
-
-      // If clicked inside right bar or on toggle button, do nothing
-      if ((rightbar && rightbar.contains(event.target)) || (rightbarToggle && rightbarToggle.contains(event.target))) {
-        return
-      } else {
-        // If clicked outside of rightbar then hide it
-        showRightSidebarAction(false)
-      }
-    },
-    [showRightSidebarAction],
-  )
-
-  // Initialize layout settings
-  useEffect(() => {
-    // Set default layout
-    changeLayout("vertical")
-
-    // Initialize body click event for toggle rightbar
-    document.body.addEventListener("click", hideRightbar, true)
-
-    return () => {
-      document.body.removeEventListener("click", hideRightbar, true)
-    }
-  }, [changeLayout, hideRightbar])
-
-  // Handle preloader
-  useEffect(() => {
-    const preloader = document.getElementById("preloader")
-    const status = document.getElementById("status")
-
-    if (isPreloader) {
-      if (preloader) preloader.style.display = "block"
-      if (status) status.style.display = "block"
-
-      setTimeout(() => {
-        if (preloader) preloader.style.display = "none"
-        if (status) status.style.display = "none"
-      }, 2500)
+  //hides right sidebar on body click
+  const hideRightbar = (event) => {
+    var rightbar = document.getElementById("right-bar");
+    //if clicked in inside right bar, then do nothing
+    if (rightbar && rightbar.contains(event.target)) {
+      return;
     } else {
-      if (preloader) preloader.style.display = "none"
-      if (status) status.style.display = "none"
+      //if clicked in outside of rightbar then fire action for hide rightbar
+      dispatch(showRightSidebarAction(false));
     }
-  }, [isPreloader])
+  };
 
-  // Scroll to top on route change
+  /*
+  layout  settings
+  */
+
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [url])
+    //init body click event fot toggle rightbar
+    document.body.addEventListener("click", hideRightbar, true);
 
-  // Handle right sidebar visibility
-  useEffect(() => {
-    const rightBar = document.getElementById("right-bar")
-    const overlay = document.querySelector(".rightbar-overlay")
+    if (isPreloader === true) {
+      document.getElementById("preloader").style.display = "block";
+      document.getElementById("status").style.display = "block";
 
-    if (showRightSidebar) {
-      if (rightBar) rightBar.classList.add("right-bar-enabled")
-      if (overlay) overlay.classList.add("show")
-      document.body.classList.add("right-bar-enabled")
+      setTimeout(function () {
+        document.getElementById("preloader").style.display = "none";
+        document.getElementById("status").style.display = "none";
+      }, 2500);
     } else {
-      if (rightBar) rightBar.classList.remove("right-bar-enabled")
-      if (overlay) overlay.classList.remove("show")
-      document.body.classList.remove("right-bar-enabled")
+      document.getElementById("preloader").style.display = "none";
+      document.getElementById("status").style.display = "none";
     }
-  }, [showRightSidebar])
+  }, [isPreloader]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    dispatch(changeLayout("vertical"));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (leftSideBarTheme) {
+      dispatch(changeSidebarTheme(leftSideBarTheme));
+    }
+  }, [leftSideBarTheme, dispatch]);
+
+  useEffect(() => {
+    if (layoutModeType) {
+      dispatch(changeLayoutMode(layoutModeType));
+    }
+  }, [layoutModeType, dispatch]);
+
+  useEffect(() => {
+    if (leftSideBarThemeImage) {
+      dispatch(changeSidebarThemeImage(leftSideBarThemeImage));
+    }
+  }, [leftSideBarThemeImage, dispatch]);
+
+  useEffect(() => {
+    if (layoutWidth) {
+      dispatch(changeLayoutWidth(layoutWidth));
+    }
+  }, [layoutWidth, dispatch]);
+
+  useEffect(() => {
+    if (leftSideBarType) {
+      dispatch(changeSidebarType(leftSideBarType));
+    }
+  }, [leftSideBarType, dispatch]);
+
+  useEffect(() => {
+    if (topbarTheme) {
+      dispatch(changeTopbarTheme(topbarTheme));
+    }
+  }, [topbarTheme, dispatch]);
 
   return (
     <React.Fragment>
@@ -145,26 +154,34 @@ const LayoutContent = ({ children }) => {
 
       <div id="layout-wrapper">
         <Header toggleMenuCallback={toggleMenuCallback} />
-        <Sidebar theme={leftSideBarTheme} type={leftSideBarType} isMobile={isMobile} />
-        <div className="main-content">
-          <div className="page-content">
-            <div className="container-fluid">{children}</div>
-          </div>
-        </div>
+        <Sidebar
+          theme={leftSideBarTheme}
+          type={leftSideBarType}
+          isMobile={isMobile}
+        />
+        <div className="main-content">{props.children}</div>
         <Footer />
       </div>
-
-      {showRightSidebar && <RightSidebar />}
+      {showRightSidebar ? <RightSidebar /> : null}
     </React.Fragment>
-  )
-}
+  );
+};
 
-const Layout = ({ children }) => {
-  return (
-    <LayoutProvider>
-      <LayoutContent>{children}</LayoutContent>
-    </LayoutProvider>
-  )
-}
+Layout.propTypes = {
+  changeLayoutWidth: PropTypes.func,
+  changeSidebarTheme: PropTypes.func,
+  changeSidebarThemeImage: PropTypes.func,
+  changeSidebarType: PropTypes.func,
+  changeTopbarTheme: PropTypes.func,
+  // children: PropTypes.object,
+  isPreloader: PropTypes.any,
+  layoutWidth: PropTypes.any,
+  leftSideBarTheme: PropTypes.any,
+  leftSideBarThemeImage: PropTypes.any,
+  leftSideBarType: PropTypes.any,
+  location: PropTypes.object,
+  showRightSidebar: PropTypes.any,
+  topbarTheme: PropTypes.any,
+};
 
-export default Layout
+export default Layout;

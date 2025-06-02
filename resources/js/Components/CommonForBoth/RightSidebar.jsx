@@ -1,12 +1,38 @@
-"use client"
+import React from "react";
+import PropTypes from "prop-types";
+import { Row, Col, FormGroup } from "reactstrap";
 
-import React from "react"
-import { Row, Col, FormGroup } from "reactstrap"
-import SimpleBar from "simplebar-react"
-
-// Layout Context
+import { connect } from "react-redux";
 import {
-  useLayout,
+  changeLayout,
+  changeLayoutMode,
+  changeLayoutWidth,
+  changeSidebarTheme,
+  changeSidebarThemeImage,
+  changeSidebarType,
+  changePreloader,
+  changeTopbarTheme,
+  showRightSidebarAction,
+} from "@/store/actions";
+
+//SimpleBar
+import SimpleBar from "simplebar-react";
+
+import { Link } from "@inertiajs/react";
+
+import "@/Components/CommonForBoth/rightbar.scss";
+
+//Import images
+import bgimg1 from "@/assets/images/sidebar/img1.jpg";
+import bgimg2 from "@/assets/images/sidebar/img2.jpg";
+import bgimg3 from "@/assets/images/sidebar/img3.jpg";
+import bgimg4 from "@/assets/images/sidebar/img4.jpg";
+import layout1 from "@/assets/images/layouts/layout-1.jpg";
+import layout2 from "@/assets/images/layouts/layout-2.jpg";
+import layout3 from "@/assets/images/layouts/layout-3.jpg";
+
+//constants
+import {
   layoutTypes,
   layoutModeTypes,
   layoutWidthTypes,
@@ -14,42 +40,9 @@ import {
   leftBarThemeImageTypes,
   leftSidebarTypes,
   leftSideBarThemeTypes,
-} from "@/Contexts/LayoutContext"
+} from "@/constants/layout";
 
-// Import images - place these in public/images/
-import bgimg1 from "@/assets/images/sidebar/img1.jpg"
-import bgimg2 from "@/assets/images/sidebar/img2.jpg"
-import bgimg3 from "@/assets/images/sidebar/img3.jpg"
-import bgimg4 from "@/assets/images/sidebar/img4.jpg"
-import layout1 from "@/assets/images/layouts/layout-1.jpg"
-import layout2 from "@/assets/images/layouts/layout-2.jpg"
-import layout3 from "@/assets/images/layouts/layout-3.jpg"
-
-const RightSidebar = () => {
-  const {
-    layoutType,
-    layoutModeType,
-    layoutWidth,
-    leftSideBarTheme,
-    leftSideBarThemeImage,
-    leftSideBarType,
-    topbarTheme,
-    isPreloader,
-    changeLayout,
-    changeLayoutMode,
-    changeLayoutWidth,
-    changeSidebarTheme,
-    changeSidebarThemeImage,
-    changeSidebarType,
-    changeTopbarTheme,
-    changePreloader,
-    showRightSidebarAction,
-  } = useLayout()
-
-  const handleCloseRightSidebar = (e) => {
-    e.preventDefault()
-    showRightSidebarAction(false)
-  }
+const RightSidebar = props => {
 
   return (
     <React.Fragment>
@@ -57,13 +50,16 @@ const RightSidebar = () => {
         <SimpleBar style={{ height: "900px" }}>
           <div data-simplebar className="h-100">
             <div className="rightbar-title px-3 py-4">
-              <button
-                onClick={handleCloseRightSidebar}
-                className="right-bar-toggle float-end btn btn-sm"
-                style={{ border: "none", background: "none" }}
+              <Link
+                to="#"
+                onClick={e => {
+                  e.preventDefault()
+                  props.showRightSidebarAction(false)
+                }}
+                className="right-bar-toggle float-end"
               >
                 <i className="mdi mdi-close noti-icon" />
-              </button>
+              </Link>
               <h5 className="m-0">Settings</h5>
             </div>
 
@@ -77,25 +73,23 @@ const RightSidebar = () => {
                   id="radioVertical"
                   name="radioFruit"
                   value={layoutTypes.VERTICAL}
-                  checked={layoutType === layoutTypes.VERTICAL}
-                  onChange={(e) => {
+                  checked={props.layoutType === layoutTypes.VERTICAL}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayout(e.target.value)
+                      props.changeLayout(e.target.value);
                     }
                   }}
                 />
-                <label className="me-1" htmlFor="radioVertical">
-                  Vertical
-                </label>
+                <label className="me-1" htmlFor="radioVertical">Vertical</label>
                 <input
                   type="radio"
                   id="radioHorizontal"
                   name="radioFruit"
                   value={layoutTypes.HORIZONTAL}
-                  checked={layoutType === layoutTypes.HORIZONTAL}
-                  onChange={(e) => {
+                  checked={props.layoutType === layoutTypes.HORIZONTAL}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayout(e.target.value)
+                      props.changeLayout(e.target.value);
                     }
                   }}
                 />
@@ -110,25 +104,23 @@ const RightSidebar = () => {
                   id="radioLight"
                   name="radioLight"
                   value={layoutModeTypes.LIGHT}
-                  checked={layoutModeType === layoutModeTypes.LIGHT}
-                  onChange={(e) => {
+                  checked={props.layoutModeType === layoutModeTypes.LIGHT}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayoutMode(e.target.value)
+                      props.changeLayoutMode(e.target.value);
                     }
                   }}
                 />
-                <label className="me-1" htmlFor="radioLight">
-                  Light
-                </label>
+                <label className="me-1" htmlFor="radioLight">Light</label>
                 <input
                   type="radio"
                   id="radioDark"
                   name="radioDark"
                   value={layoutModeTypes.DARK}
-                  checked={layoutModeType === layoutModeTypes.DARK}
-                  onChange={(e) => {
+                  checked={props.layoutModeType === layoutModeTypes.DARK}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayoutMode(e.target.value)
+                      props.changeLayoutMode(e.target.value);
                     }
                   }}
                 />
@@ -145,25 +137,23 @@ const RightSidebar = () => {
                   id="radioFluid"
                   name="radioWidth"
                   value={layoutWidthTypes.FLUID}
-                  checked={layoutWidth === layoutWidthTypes.FLUID}
-                  onChange={(e) => {
+                  checked={props.layoutWidth === layoutWidthTypes.FLUID}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayoutWidth(e.target.value)
+                      props.changeLayoutWidth(e.target.value);
                     }
                   }}
                 />
-                <label className="me-1" htmlFor="radioFluid">
-                  Fluid
-                </label>
+                <label className="me-1" htmlFor="radioFluid">Fluid</label>
                 <input
                   type="radio"
                   id="radioBoxed"
                   name="radioWidth"
                   value={layoutWidthTypes.BOXED}
-                  checked={layoutWidth === layoutWidthTypes.BOXED}
-                  onChange={(e) => {
+                  checked={props.layoutWidth === layoutWidthTypes.BOXED}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayoutWidth(e.target.value)
+                      props.changeLayoutWidth(e.target.value);
                     }
                   }}
                 />
@@ -175,10 +165,10 @@ const RightSidebar = () => {
                   id="radioscrollable"
                   name="radioscrollable"
                   value={layoutWidthTypes.SCROLLABLE}
-                  checked={layoutWidth === layoutWidthTypes.SCROLLABLE}
-                  onChange={(e) => {
+                  checked={props.layoutWidth === layoutWidthTypes.SCROLLABLE}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeLayoutWidth(e.target.value)
+                      props.changeLayoutWidth(e.target.value);
                     }
                   }}
                 />
@@ -195,104 +185,92 @@ const RightSidebar = () => {
                   id="radioThemeLight"
                   name="radioTheme"
                   value={topBarThemeTypes.LIGHT}
-                  checked={topbarTheme === topBarThemeTypes.LIGHT}
-                  onChange={(e) => {
+                  checked={props.topbarTheme === topBarThemeTypes.LIGHT}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeTopbarTheme(e.target.value)
+                      props.changeTopbarTheme(e.target.value);
                     }
                   }}
                 />
-                <label className="me-1" htmlFor="radioThemeLight">
-                  Light
-                </label>
+                <label className="me-1" htmlFor="radioThemeLight">Light</label>
                 <input
                   type="radio"
                   id="radioThemeDark"
                   name="radioTheme"
                   value={topBarThemeTypes.DARK}
-                  checked={topbarTheme === topBarThemeTypes.DARK}
-                  onChange={(e) => {
+                  checked={props.topbarTheme === topBarThemeTypes.DARK}
+                  onChange={e => {
                     if (e.target.checked) {
-                      changeTopbarTheme(e.target.value)
+                      props.changeTopbarTheme(e.target.value);
                     }
                   }}
                 />
-                <label className="me-1" htmlFor="radioThemeDark">
-                  Dark
-                </label>
-                {layoutType === "vertical" ? null : (
+                <label className="me-1" htmlFor="radioThemeDark">Dark</label>
+                {props.layoutType === "vertical" ? null : (
                   <>
                     <input
                       type="radio"
                       id="radioThemeColored"
                       name="radioTheme"
                       value={topBarThemeTypes.COLORED}
-                      checked={topbarTheme === topBarThemeTypes.COLORED}
-                      onChange={(e) => {
+                      checked={props.topbarTheme === topBarThemeTypes.COLORED}
+                      onChange={e => {
                         if (e.target.checked) {
-                          changeTopbarTheme(e.target.value)
+                          props.changeTopbarTheme(e.target.value);
                         }
                       }}
                     />
-                    <label className="me-1" htmlFor="radioThemeColored">
-                      Colored
-                    </label>
+                    <label className="me-1" htmlFor="radioThemeColored">Colored</label>{" "}
                   </>
                 )}
               </div>
 
-              {layoutType === "vertical" ? (
+              {props.layoutType === "vertical" ? (
                 <React.Fragment>
                   <hr className="mt-1" />
                   <div className="radio-toolbar">
                     <span className="mb-2 d-block" id="radio-title">
-                      Left Sidebar Type
+                      Left Sidebar Type{" "}
                     </span>
                     <input
                       type="radio"
                       id="sidebarDefault"
                       name="sidebarType"
                       value={leftSidebarTypes.DEFAULT}
-                      checked={leftSideBarType === leftSidebarTypes.DEFAULT}
-                      onChange={(e) => {
+                      checked={props.leftSideBarType === leftSidebarTypes.DEFAULT}
+                      onChange={e => {
                         if (e.target.checked) {
-                          changeSidebarType(e.target.value)
+                          props.changeSidebarType(e.target.value);
                         }
                       }}
                     />
-                    <label className="me-1" htmlFor="sidebarDefault">
-                      Default
-                    </label>
+                    <label className="me-1" htmlFor="sidebarDefault">Default</label>
                     <input
                       type="radio"
                       id="sidebarCompact"
                       name="sidebarType"
                       value={leftSidebarTypes.COMPACT}
-                      checked={leftSideBarType === leftSidebarTypes.COMPACT}
-                      onChange={(e) => {
+                      checked={props.leftSideBarType === leftSidebarTypes.COMPACT}
+                      onChange={e => {
                         if (e.target.checked) {
-                          changeSidebarType(e.target.value)
+                          props.changeSidebarType(e.target.value);
                         }
                       }}
                     />
-                    <label className="me-1" htmlFor="sidebarCompact">
-                      Compact
-                    </label>
+                    <label className="me-1" htmlFor="sidebarCompact">Compact</label>
                     <input
                       type="radio"
                       id="sidebarIcon"
                       name="sidebarType"
                       value={leftSidebarTypes.ICON}
-                      checked={leftSideBarType === leftSidebarTypes.ICON}
-                      onChange={(e) => {
+                      checked={props.leftSideBarType === leftSidebarTypes.ICON}
+                      onChange={e => {
                         if (e.target.checked) {
-                          changeSidebarType(e.target.value)
+                          props.changeSidebarType(e.target.value);
                         }
                       }}
                     />
-                    <label className="me-1" htmlFor="sidebarIcon">
-                      Icon
-                    </label>
+                    <label className="me-1" htmlFor="sidebarIcon">Icon</label>
                   </div>
 
                   <hr className="mt-1" />
@@ -308,20 +286,16 @@ const RightSidebar = () => {
                           id="leftsidebarThemelight"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.LIGHT}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.LIGHT}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.LIGHT}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
                         <label
                           htmlFor="leftsidebarThemelight"
-                          className={
-                            layoutModeType === "dark"
-                              ? "bg-dark rounded-circle wh-30 me-1"
-                              : "bg-light rounded-circle wh-30 me-1"
-                          }
+                          className={props.layoutModeType === "dark" ? "bg-dark rounded-circle wh-30 me-1" : "bg-light rounded-circle wh-30 me-1"}
                         ></label>
 
                         <input
@@ -329,20 +303,16 @@ const RightSidebar = () => {
                           id="leftsidebarThemedark"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.DARK}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.DARK}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.DARK}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
                         <label
                           htmlFor="leftsidebarThemedark"
-                          className={
-                            layoutModeType === "light"
-                              ? "bg-dark rounded-circle wh-30 me-1"
-                              : "bg-light rounded-circle wh-30 me-1"
-                          }
+                          className={props.layoutModeType === "light" ? "bg-dark rounded-circle wh-30 me-1" : "bg-light rounded-circle wh-30 me-1"}
                         ></label>
 
                         <input
@@ -350,10 +320,10 @@ const RightSidebar = () => {
                           id="leftsidebarThemecolored"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.COLORED}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.COLORED}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.COLORED}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -365,15 +335,16 @@ const RightSidebar = () => {
                     </Row>
                     <Row>
                       <Col>
+
                         <input
                           type="radio"
                           id="leftsidebarThemewinter"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.WINTER}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.WINTER}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.WINTER}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -387,10 +358,10 @@ const RightSidebar = () => {
                           id="leftsidebarThemeladylip"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.LADYLIP}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.LADYLIP}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.LADYLIP}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -404,10 +375,10 @@ const RightSidebar = () => {
                           id="leftsidebarThemeplumplate"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.PLUMPLATE}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.PLUMPLATE}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.PLUMPLATE}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -421,10 +392,10 @@ const RightSidebar = () => {
                           id="leftsidebarThemestrongbliss"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.STRONGBLISS}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.STRONGBLISS}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.STRONGBLISS}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -432,16 +403,15 @@ const RightSidebar = () => {
                           htmlFor="leftsidebarThemestrongbliss"
                           className="gradient-strong-bliss rounded-circle wh-30 me-1"
                         ></label>
-
                         <input
                           type="radio"
                           id="leftsidebarThemesgreatwhale"
                           name="leftsidebarTheme"
                           value={leftSideBarThemeTypes.GREATWHALE}
-                          checked={leftSideBarTheme === leftSideBarThemeTypes.GREATWHALE}
-                          onChange={(e) => {
+                          checked={props.leftSideBarTheme === leftSideBarThemeTypes.GREATWHALE}
+                          onChange={e => {
                             if (e.target.checked) {
-                              changeSidebarTheme(e.target.value)
+                              props.changeSidebarTheme(e.target.value);
                             }
                           }}
                         />
@@ -452,7 +422,6 @@ const RightSidebar = () => {
                       </Col>
                     </Row>
                   </div>
-
                   <div className="radio-toolbar imgopt-radio">
                     <span className="mb-2 d-block" id="radio-bgimg">
                       Left Sidebar Bg Image
@@ -463,73 +432,78 @@ const RightSidebar = () => {
                         id="leftsidebarThemebgimg1"
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG1}
-                        checked={leftSideBarThemeImage === leftBarThemeImageTypes.IMG1}
-                        onChange={(e) => {
+                        checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG1}
+                        onChange={e => {
                           if (e.target.checked) {
-                            changeSidebarThemeImage(e.target.value)
+                            props.changeSidebarThemeImage(e.target.value);
                           }
                         }}
                       />
+
                       <label htmlFor="leftsidebarThemebgimg1">
                         <img
                           alt="sidebar bg image"
                           width="90"
                           className="themesideimage rounded"
-                          src={bgimg1 || "/placeholder.svg?height=90&width=90"}
+                          src={bgimg1}
                         />
                       </label>
+                      {"   "}
 
                       <input
                         type="radio"
                         id="leftsidebarThemebgimg2"
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG2}
-                        checked={leftSideBarThemeImage === leftBarThemeImageTypes.IMG2}
-                        onChange={(e) => {
+                        checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG2}
+                        onChange={e => {
                           if (e.target.checked) {
-                            changeSidebarThemeImage(e.target.value)
+                            props.changeSidebarThemeImage(e.target.value);
                           }
                         }}
                       />
+
                       <label htmlFor="leftsidebarThemebgimg2">
                         <img
                           alt="sidebar bg image"
                           width="90"
                           className="themesideimage rounded"
-                          src={bgimg2 || "/placeholder.svg?height=90&width=90"}
+                          src={bgimg2}
                         />
                       </label>
+                      {"   "}
 
                       <input
                         type="radio"
                         id="leftsidebarThemebgimg3"
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG3}
-                        checked={leftSideBarThemeImage === leftBarThemeImageTypes.IMG3}
-                        onChange={(e) => {
+                        checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG3}
+                        onChange={e => {
                           if (e.target.checked) {
-                            changeSidebarThemeImage(e.target.value)
+                            props.changeSidebarThemeImage(e.target.value);
                           }
                         }}
                       />
+
                       <label htmlFor="leftsidebarThemebgimg3">
                         <img
                           alt="sidebar bg image"
                           width="90"
                           className="themesideimage rounded"
-                          src={bgimg3 || "/placeholder.svg?height=90&width=90"}
+                          src={bgimg3}
                         />
                       </label>
-
+                      {"   "}
                       <input
                         type="radio"
                         id="leftsidebarThemebgimg4"
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.IMG4}
-                        checked={leftSideBarThemeImage === leftBarThemeImageTypes.IMG4}
-                        onChange={(e) => {
+                        checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.IMG4}
+                        onChange={e => {
                           if (e.target.checked) {
-                            changeSidebarThemeImage(e.target.value)
+                            props.changeSidebarThemeImage(e.target.value);
                           }
                         }}
                       />
@@ -538,19 +512,20 @@ const RightSidebar = () => {
                           alt="sidebar bg image"
                           width="90"
                           className="themesideimage rounded"
-                          src={bgimg4 || "/placeholder.svg?height=90&width=90"}
+                          src={bgimg4}
                         />
                       </label>
+                      {"   "}
 
                       <input
                         type="radio"
                         id="leftsidebarThemenone"
                         name="leftsidebarThemeImage"
                         value={leftBarThemeImageTypes.NONE}
-                        checked={leftSideBarThemeImage === leftBarThemeImageTypes.NONE}
-                        onChange={(e) => {
+                        checked={props.leftSideBarThemeImage === leftBarThemeImageTypes.NONE}
+                        onChange={e => {
                           if (e.target.checked) {
-                            changeSidebarThemeImage(e.target.value)
+                            props.changeSidebarThemeImage(e.target.value);
                           }
                         }}
                       />
@@ -561,6 +536,7 @@ const RightSidebar = () => {
                           </div>
                         </div>
                       </label>
+                      {"   "}
                     </div>
                   </div>
                   <hr className="mt-1" />
@@ -571,16 +547,18 @@ const RightSidebar = () => {
                 <span className="mb-2 d-block" id="radio-title">
                   Preloader
                 </span>
+
                 <div className="form-check form-switch">
                   <input
                     type="checkbox"
                     className="form-check-input checkbox"
                     id="checkbox_1"
-                    checked={isPreloader}
+                    checked={props.isPreloader}
                     onChange={() => {
-                      changePreloader(!isPreloader)
+                      props.changePreloader(!props.isPreloader);
                     }}
                   />
+
                   <label className="form-check-label" htmlFor="checkbox_1">
                     Preloader
                   </label>
@@ -590,50 +568,72 @@ const RightSidebar = () => {
               <h6 className="text-center">Choose Layouts</h6>
 
               <div className="mb-2">
-                <a href="//skote-v-light.react.themesbrand.com" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={layout1 || "/placeholder.svg?height=200&width=300"}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </a>
+                <Link to="//skote-v-light.react.themesbrand.com" target="_blank">
+                  <img src={layout1} className="img-fluid img-thumbnail" alt="" />
+                </Link>
               </div>
 
               <div className="mb-2">
-                <a href="//skote-v-dark.react.themesbrand.com" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={layout2 || "/placeholder.svg?height=200&width=300"}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </a>
+                <Link to="//skote-v-dark.react.themesbrand.com" target="_blank">
+                  <img src={layout2} className="img-fluid img-thumbnail" alt="" />
+                </Link>
               </div>
 
               <div className="mb-2">
-                <a href="//skote-v-rtl.react.themesbrand.com" target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={layout3 || "/placeholder.svg?height=200&width=300"}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </a>
+                <Link to="//skote-v-rtl.react.themesbrand.com" target="_blank">
+                  <img src={layout3} className="img-fluid img-thumbnail" alt="" />
+                </Link>
               </div>
 
-              <a
-                href="//1.envato.market/skotereact"
+              <Link
+                to="//1.envato.market/skotereact"
                 className="btn btn-primary btn-block mt-3"
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 <i className="mdi mdi-cart ms-1" /> Purchase Now
-              </a>
+              </Link>
             </div>
           </div>
         </SimpleBar>
       </div>
       <div className="rightbar-overlay"></div>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default RightSidebar
+RightSidebar.propTypes = {
+  changeLayout: PropTypes.func,
+  changeLayoutWidth: PropTypes.func,
+  changePreloader: PropTypes.func,
+  changeSidebarTheme: PropTypes.func,
+  changeSidebarThemeImage: PropTypes.func,
+  changeSidebarType: PropTypes.func,
+  changeTopbarTheme: PropTypes.func,
+  isPreloader: PropTypes.any,
+  layoutType: PropTypes.any,
+  layoutModeType: PropTypes.any,
+  changeLayoutMode: PropTypes.func,
+  layoutWidth: PropTypes.any,
+  leftSideBarTheme: PropTypes.any,
+  leftSideBarThemeImage: PropTypes.any,
+  leftSideBarType: PropTypes.any,
+  showRightSidebarAction: PropTypes.func,
+  topbarTheme: PropTypes.any,
+  onClose: PropTypes.func,
+};
+
+const mapStateToProps = state => {
+  return { ...state.Layout };
+};
+
+export default connect(mapStateToProps, {
+  changeLayout,
+  changeLayoutMode,
+  changeSidebarTheme,
+  changeSidebarThemeImage,
+  changeSidebarType,
+  changeLayoutWidth,
+  changeTopbarTheme,
+  changePreloader,
+  showRightSidebarAction,
+})(RightSidebar);

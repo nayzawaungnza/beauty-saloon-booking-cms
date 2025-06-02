@@ -1,52 +1,34 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-} from "reactstrap";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+import { get, map } from "lodash";
+import { useTranslation } from "react-i18next";
+import { Inertia } from "@inertiajs/inertia";
 
-// Language configuration
-const languages = {
-  en: {
-    label: "English",
-    flag: "../src/assets/images/flags/us.jpg",
-  },
-  es: {
-    label: "Spanish",
-    flag: "../src/assets/images/flags/spain.jpg",
-  },
-  de: {
-    label: "German",
-    flag: "../src/assets/images/flags/germany.jpg",
-  },
-  it: {
-    label: "Italian",
-    flag: "../src/assets/images/flags/italy.jpg",
-  },
-  ru: {
-    label: "Russian",
-    flag: "../src/assets/images/flags/russia.jpg",
-  },
-};
+// i18n
+import i18n from "@/i18n";
+import languages from "@/common/languages";
 
 const LanguageDropdown = () => {
-  const [selectedLang, setSelectedLang] = useState("en");
+  const [selectedLang, setSelectedLang] = useState("");
   const [menu, setMenu] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    const currentLanguage = localStorage.getItem("I18N_LANGUAGE") || "en";
+    const currentLanguage = localStorage.getItem("I18N_LANGUAGE") || i18n.language;
     setSelectedLang(currentLanguage);
   }, []);
 
   const changeLanguageAction = (lang) => {
-    // Set language in localStorage
+    // Change language in i18n
+    i18n.changeLanguage(lang);
     localStorage.setItem("I18N_LANGUAGE", lang);
     setSelectedLang(lang);
     
-    // You can implement actual language switching logic here
-    // For example, using react-i18next or sending to server
-    console.log("Language changed to:", lang);
+    // Notify Laravel backend about language change
+    Inertia.post(route('language.change'), { locale: lang }, {
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   const toggle = () => {
@@ -54,35 +36,36 @@ const LanguageDropdown = () => {
   };
 
   return (
-    <>
-      <Dropdown isOpen={menu} toggle={toggle} className="d-inline-block">
-        <DropdownToggle className="btn header-item" tag="button">
-          <img
-            src={languages[selectedLang]?.flag || "/placeholder.svg"}
-            alt="Language"
-            height="16"
-            className="me-1"
-          />
-        </DropdownToggle>
-        <DropdownMenu className="language-switch dropdown-menu-end">
-          {Object.keys(languages).map((key) => (
-            <DropdownItem
-              key={key}
-              onClick={() => changeLanguageAction(key)}
-              className={`notify-item ${selectedLang === key ? "active" : ""}`}
-            >
-              <img
-                src={languages[key].flag || "/placeholder.svg"}
-                alt={languages[key].label}
-                className="me-1"
-                height="12"
-              />
-              <span className="align-middle">{languages[key].label}</span>
-            </DropdownItem>
-          ))}
-        </DropdownMenu>
-      </Dropdown>
-    </>
+    <Dropdown isOpen={menu} toggle={toggle} className="d-inline-block">
+      <DropdownToggle className="btn header-item" tag="button">
+        <img
+          src={get(languages, `${selectedLang}.flag`)}
+          alt={t("Language")}
+          height="16"
+          className="me-1"
+        />
+        <span className="d-none d-sm-inline-block">{get(languages, `${selectedLang}.label`)}</span>
+      </DropdownToggle>
+      <DropdownMenu className="language-switch dropdown-menu-end">
+        {map(Object.keys(languages), (key) => (
+          <DropdownItem
+            key={key}
+            onClick={() => changeLanguageAction(key)}
+            className={`notify-item ${selectedLang === key ? "active" : "none"}`}
+          >
+            <img
+              src={get(languages, `${key}.flag`)}
+              alt={get(languages, `${key}.label`)}
+              className="me-1"
+              height="12"
+            />
+            <span className="align-middle">
+              {get(languages, `${key}.label`)}
+            </span>
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
   );
 };
 
