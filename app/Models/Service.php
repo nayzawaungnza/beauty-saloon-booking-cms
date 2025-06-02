@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\Uuids;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Service extends Model
+{
+    use HasFactory, Notifiable, Uuids, SoftDeletes, HasSlug;
+    protected $fillable = [
+        'name',
+        'description',
+        'duration',
+        'price',
+        'excerpt',
+        'is_promotion',
+        'discount_price',
+        'requires_buffer',
+        'is_active',
+        'created_by',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_promotion' => 'boolean',
+        'requires_buffer' => 'boolean',
+    ];
+   
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function getSlugOptions() : SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom(['name']) // Generate slug from multiple fields
+            ->saveSlugsTo('slug')
+            ->slugsShouldBeNoLongerThan(50)
+            ->doNotGenerateSlugsOnUpdate() // Limit the length of the slug
+            ->usingSeparator('-'); // Use underscore as separator
+    }
+
+    // public function staff(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Staff::class, 'staff_service');
+    // }
+
+    //  // Relationship: A Service can be part of many Bookings
+    // public function bookings(): HasMany
+    // {
+    //     return $this->hasMany(Booking::class);
+    // }
+
+    public function default_image()
+    {
+        return $this->morphOne(Image::class, 'resourceable', 'resourceable_type', 'resourceable_id')
+            ->where('is_default', config('constants.STATUS_TRUE'));
+    }
+    
+}
