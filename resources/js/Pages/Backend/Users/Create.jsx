@@ -33,7 +33,7 @@ const Create = ({ errors = {} }) => {
       }
 
       // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
         toast.error('Please select a valid image file (JPEG, PNG, JPG, GIF)');
         return;
@@ -223,12 +223,12 @@ const Create = ({ errors = {} }) => {
                           <div className="avatar-lg">
                             <div className="avatar-title bg-light rounded-circle position-relative">
                               <img 
-                                src={selectedImage || '/assets/images/users/avatar.png'} 
+                                src={selectedImage || '/src/assets/images/users/avatar.png'} 
                                 id="profile-img" 
                                 alt="Profile" 
                                 className="avatar-md h-auto rounded-circle" 
                                 onError={(e) => {
-                                  e.target.src = '/assets/images/users/avatar.png';
+                                  e.target.src = '/src/assets/images/users/avatar.png';
                                 }}
                               />
                               {selectedImage && (

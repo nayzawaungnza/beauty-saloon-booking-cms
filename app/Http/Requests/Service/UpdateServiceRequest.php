@@ -35,6 +35,8 @@ class UpdateServiceRequest extends FormRequest
             'service_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'string|exists:images,id',
         ];
     }
 

@@ -17,12 +17,11 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  Badge, Button
+  Badge,
 } from "reactstrap"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-//import { route } from "inertiajs"
-
+import ImageModal from "@/components/common/ImageModal"
 
 const Index = ({ services }) => {
   document.title = "Services List | Admin Dashboard"
@@ -31,8 +30,8 @@ const Index = ({ services }) => {
   const [service, setService] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [activateModal, setActivateModal] = useState(false)
-
-  
+  const [imageModal, setImageModal] = useState(false)
+  const [selectedServiceImages, setSelectedServiceImages] = useState(null)
 
   useEffect(() => {
     if (flash.success) {
@@ -49,11 +48,11 @@ const Index = ({ services }) => {
         onSuccess: () => {
           setDeleteModal(false)
           setService(null)
-
-          //toast.success(flash.success)
+          //toast.success("Service deleted successfully")
         },
-        onError: () => {
-          //toast.error(flash.error)
+        onError: (errors) => {
+          //toast.error("Failed to delete service")
+          console.error(errors)
         },
       })
     }
@@ -65,19 +64,25 @@ const Index = ({ services }) => {
 
       router.patch(
         route("admin.services.changeStatus", service.id),
-        {},
+        { is_active: !service.is_active },
         {
           onSuccess: () => {
             setActivateModal(false)
             setService(null)
-            toast.success(`service ${action}d successfully`)
+            //toast.success(`Service ${action}d successfully`)
           },
-          onError: () => {
-            toast.error(`Failed to ${action} service`)
+          onError: (errors) => {
+            //toast.error(`Failed to ${action} service`)
+            console.error(errors)
           },
         },
       )
     }
+  }
+
+  const handleViewImages = (service) => {
+    setSelectedServiceImages(service)
+    setImageModal(true)
   }
 
   const columns = useMemo(
@@ -89,22 +94,72 @@ const Index = ({ services }) => {
         enableSorting: true,
       },
       {
-        header: "Description",
-        accessorKey: "description",
+        header: "Image",
+        accessorKey: "default_image",
         enableColumnFilter: false,
         enableSorting: false,
+        cell: ({ row }) => (
+          <div className="d-flex align-items-center">
+            <div className="flex-shrink-0 me-2">
+              {row.original.default_image ? (
+                <img
+                  src={`/storage/${row.original.default_image.image_url}`}
+                  alt={row.original.name}
+                  className="rounded"
+                  style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                />
+              ) : (
+                <div
+                  className="bg-light rounded d-flex align-items-center justify-content-center"
+                  style={{ width: "40px", height: "40px" }}
+                >
+                  <i className="mdi mdi-image-outline text-muted"></i>
+                </div>
+              )}
+            </div>
+            <div className="flex-grow-1">
+              {row.original.gallery_images && row.original.gallery_images.length > 0 && (
+                <small className="text-muted">+{row.original.gallery_images.length} more</small>
+              )}
+            </div>
+          </div>
+        ),
       },
+      // {
+      //   header: "Description",
+      //   accessorKey: "description",
+      //   enableColumnFilter: false,
+      //   enableSorting: false,
+      //   cell: ({ row }) => (
+      //     <div className="text-truncate" style={{ maxWidth: "200px" }}>
+      //       {row.original.description || "No description"}
+      //     </div>
+      //   ),
+      // },
       {
         header: "Price",
         accessorKey: "price",
         enableColumnFilter: false,
         enableSorting: true,
+        cell: ({ row }) => <span>${Number.parseFloat(row.original.price || 0).toFixed(2)}</span>,
       },
       {
-        header: "Buffer",
-        accessorKey: "require_buffer",
+        header: "Duration",
+        accessorKey: "duration",
         enableColumnFilter: false,
         enableSorting: false,
+        cell: ({ row }) => <span>{row.original.duration ? `${row.original.duration} min` : "N/A"}</span>,
+      },
+      {
+        header: "Buffer Required",
+        accessorKey: "requires_buffer",
+        enableColumnFilter: false,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <Badge className={row.original.requires_buffer ? "bg-info" : "bg-secondary"}>
+            {row.original.requires_buffer ? "Yes" : "No"}
+          </Badge>
+        ),
       },
       {
         header: "Status",
@@ -117,7 +172,6 @@ const Index = ({ services }) => {
           </Badge>
         ),
       },
-      
       {
         header: "Action",
         enableColumnFilter: false,
@@ -131,10 +185,32 @@ const Index = ({ services }) => {
                 id={`viewtooltip-${row.original.id}`}
               >
                 <i className="mdi mdi-eye-outline" />
-                <UncontrolledTooltip placement="top" target={`viewtooltip-${row.original.id}`} transition={{ timeout: 0 }}>
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`viewtooltip-${row.original.id}`}
+                  transition={{ timeout: 0 }}
+                >
                   View
                 </UncontrolledTooltip>
               </Link>
+            </li>
+
+            <li>
+              <button
+                type="button"
+                className="btn btn-sm btn-soft-secondary"
+                onClick={() => handleViewImages(row.original)}
+                id={`imagestooltip-${row.original.id}`}
+              >
+                <i className="mdi mdi-image-multiple-outline" />
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`imagestooltip-${row.original.id}`}
+                  transition={{ timeout: 0 }}
+                >
+                  View Images ({row.original.gallery_images?.length || 0})
+                </UncontrolledTooltip>
+              </button>
             </li>
 
             <li>
@@ -144,7 +220,11 @@ const Index = ({ services }) => {
                 id={`edittooltip-${row.original.id}`}
               >
                 <i className="mdi mdi-pencil-outline" />
-                <UncontrolledTooltip placement="top" target={`edittooltip-${row.original.id}`} transition={{ timeout: 0 }}>
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`edittooltip-${row.original.id}`}
+                  transition={{ timeout: 0 }}
+                >
                   Edit
                 </UncontrolledTooltip>
               </Link>
@@ -161,7 +241,11 @@ const Index = ({ services }) => {
                 id={`activetooltip-${row.original.id}`}
               >
                 <i className={row.original.is_active ? "mdi mdi-cancel" : "mdi mdi-check-circle"} />
-                <UncontrolledTooltip placement="top" target={`activetooltip-${row.original.id}`} transition={{ timeout: 0 }}>
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`activetooltip-${row.original.id}`}
+                  transition={{ timeout: 0 }}
+                >
                   {row.original.is_active ? "Deactivate" : "Activate"}
                 </UncontrolledTooltip>
               </button>
@@ -178,7 +262,11 @@ const Index = ({ services }) => {
                 id={`deletetooltip-${row.original.id}`}
               >
                 <i className="mdi mdi-delete-outline" />
-                <UncontrolledTooltip placement="top" target={`deletetooltip-${row.original.id}`} transition={{ timeout: 0 }}>
+                <UncontrolledTooltip
+                  placement="top"
+                  target={`deletetooltip-${row.original.id}`}
+                  transition={{ timeout: 0 }}
+                >
                   Delete
                 </UncontrolledTooltip>
               </button>
@@ -192,7 +280,6 @@ const Index = ({ services }) => {
 
   return (
     <React.Fragment>
-
       <DeleteModal show={deleteModal} onDeleteClick={handleDeleteService} onCloseClick={() => setDeleteModal(false)} />
 
       <ActivateModal
@@ -200,6 +287,17 @@ const Index = ({ services }) => {
         service={service}
         onActivateClick={handleActivateService}
         onCloseClick={() => setActivateModal(false)}
+      />
+
+      <ImageModal
+        show={imageModal}
+        title={`Service Images - ${selectedServiceImages?.name || ""}`}
+        defaultImage={selectedServiceImages?.default_image}
+        images={selectedServiceImages?.gallery_images || []}
+        onCloseClick={() => {
+          setImageModal(false)
+          setSelectedServiceImages(null)
+        }}
       />
 
       <div className="page-content">
@@ -224,13 +322,13 @@ const Index = ({ services }) => {
                         </DropdownToggle>
                         <DropdownMenu>
                           <li>
-                            <DropdownItem href="#">Action</DropdownItem>
+                            <DropdownItem href="#">Export CSV</DropdownItem>
                           </li>
                           <li>
-                            <DropdownItem href="#">Another action</DropdownItem>
+                            <DropdownItem href="#">Export PDF</DropdownItem>
                           </li>
                           <li>
-                            <DropdownItem href="#">Something else here</DropdownItem>
+                            <DropdownItem href="#">Print</DropdownItem>
                           </li>
                         </DropdownMenu>
                       </UncontrolledDropdown>
@@ -239,7 +337,14 @@ const Index = ({ services }) => {
                 </CardBody>
                 <CardBody>
                   {isEmpty(services) ? (
-                    <p>No services found.</p>
+                    <div className="text-center py-4">
+                      <i className="mdi mdi-information-outline display-4 text-muted"></i>
+                      <h5 className="mt-2">No services found</h5>
+                      <p className="text-muted">Get started by creating your first service.</p>
+                      <Link href={route("admin.services.create")} className="btn btn-primary">
+                        Add New Service
+                      </Link>
+                    </div>
                   ) : (
                     <TableContainer
                       columns={columns}

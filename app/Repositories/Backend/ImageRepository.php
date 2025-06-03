@@ -97,10 +97,10 @@ class ImageRepository extends BaseRepository
                     $img->cover(config('constants.IMAGE_SIZE.XLARGE'), config('constants.IMAGE_SIZE.MEDIUM'));
                     Storage::disk('public')->put($path . '/' . Str::replaceLast('.', config('constants.IMAGE_FILE_NAME.MEDIUM'), $file_name), $img->toJpeg());
                 } 
-                elseif ($model_type == config('constants.LABEL_NAME.SERVICE')) {
-                    $img->cover(config('constants.IMAGE_SIZE.XLARGE'), config('constants.IMAGE_SIZE.MEDIUM'));
-                    Storage::disk('public')->put($path . '/' . Str::replaceLast('.', config('constants.IMAGE_FILE_NAME.MEDIUM'), $file_name), $img->toJpeg());
-                } 
+                // elseif ($model_type == config('constants.LABEL_NAME.SERVICE')) {
+                //     $img->cover(config('constants.IMAGE_SIZE.XLARGE'), config('constants.IMAGE_SIZE.MEDIUM'));
+                //     Storage::disk('public')->put($path . '/' . Str::replaceLast('.', config('constants.IMAGE_FILE_NAME.MEDIUM'), $file_name), $img->toJpeg());
+                // } 
                 elseif ($model_type == config('constants.LABEL_NAME.SERVICEBANNER')) {
                     $img->cover(config('constants.IMAGE_SIZE.SERVICEBANNERWIDTH'), config('constants.IMAGE_SIZE.SERVICEBANNERHEIGHT'));
                     Storage::disk('public')->put($path . '/' . Str::replaceLast('.', config('constants.IMAGE_FILE_NAME.BANNER'), $file_name), $img->toJpeg());
@@ -132,5 +132,25 @@ class ImageRepository extends BaseRepository
         if ($deleted) {
             $image->save();
         }
+    }
+
+    /**
+     * Delete image by ID
+     */
+    public function deleteImageById($imageId)
+    {
+        $image = $this->model->find($imageId);
+        
+        if ($image) {
+            // Delete file from storage
+            if (Storage::disk('public')->exists($image->image_url)) {
+                Storage::disk('public')->delete($image->image_url);
+            }
+            
+            // Delete database record
+            return $image->delete();
+        }
+        
+        return false;
     }
 }

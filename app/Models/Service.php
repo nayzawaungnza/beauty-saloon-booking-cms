@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Image;
 use App\Traits\Uuids;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -67,7 +68,14 @@ class Service extends Model
     public function default_image()
     {
         return $this->morphOne(Image::class, 'resourceable', 'resourceable_type', 'resourceable_id')
-            ->where('is_default', config('constants.STATUS_TRUE'));
+            ->where('is_default', config('constants.STATUS_TRUE'))->where('is_banner', config('constants.STATUS_FALSE'));
+    }
+
+    public function gallery_images()
+    {
+        return $this->morphMany(Image::class, 'resourceable', 'resourceable_type', 'resourceable_id')
+            ->where('is_default', config('constants.STATUS_FALSE'))
+            ->orderBy('id', 'asc');
     }
     
 }
