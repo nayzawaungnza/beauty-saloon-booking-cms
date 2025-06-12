@@ -21,14 +21,14 @@ import { useFormik } from "formik";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 
-import withRouter from "../../components/Common/withRouter";
+//import withRouter from "../../components/Common/withRouter";
 
 //Import Breadcrumb
-import Breadcrumb from "../../components/Common/Breadcrumb";
+import Breadcrumb from "@/components/Common/Breadcrumb";
 
-import avatar from "../../assets/images/users/avatar-1.jpg";
+import avatar from "@/assets/images/users/avatar-1.jpg";
 // actions
-import { editProfile, resetProfileFlag } from "/src/store/actions";
+import { editProfile, resetProfileFlag } from "@/store/actions";
 
 const UserProfile = (props) => {
 
@@ -172,4 +172,4 @@ const UserProfile = (props) => {
   );
 };
 
-export default withRouter(UserProfile);
+export default UserProfile;

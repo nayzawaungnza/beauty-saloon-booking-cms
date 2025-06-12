@@ -6,14 +6,14 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { registerUser, apiError } from "/src/store/actions";
+import { registerUser, apiError } from "@/store/actions";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 
-import { Link } from "react-router-dom";
-
+//import { Link } from "react-router-dom";
+import { Link } from "@inertiajs/react";
 // import images
 import profileImg from "../../assets/images/profile-img.png";
 import logo from "../../assets/images/logo.svg";

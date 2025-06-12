@@ -27,4 +27,6 @@ interface UserServiceInterface
 
     public function getClients();
     public function getSubscribers();
+
+    public function getCustomers();
 }

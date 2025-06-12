@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import withRouter from "../../components/Common/withRouter";
+//import { Link } from "react-router-dom";
+import { Link } from "@inertiajs/react";
+//import withRouter from "../../components/Common/withRouter";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
@@ -25,7 +26,7 @@ import {
 } from "reactstrap";
 
 // actions
-import { loginUser, socialLogin } from "/src/store/actions";
+import { loginUser, socialLogin } from "@/store/actions";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
@@ -291,7 +292,7 @@ const Login = (props) => {
   );
 };
 
-export default withRouter(Login);
+export default Login;
 
 Login.propTypes = {
   history: PropTypes.object,

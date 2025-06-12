@@ -16,15 +16,16 @@ import {
 //redux
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
-import { Link } from "react-router-dom";
-import withRouter from "../../components/Common/withRouter";
+//import { Link } from "react-router-dom";
+import { Link } from "@inertiajs/react";
+//import withRouter from "../../components/Common/withRouter";
 
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { userForgetPassword } from "/src/store/actions";
+import { userForgetPassword } from "@/store/actions";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
@@ -197,4 +198,4 @@ ForgetPasswordPage.propTypes = {
   history: PropTypes.object,
 };
 
-export default withRouter(ForgetPasswordPage);
+export default ForgetPasswordPage;

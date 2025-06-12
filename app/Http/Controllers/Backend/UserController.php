@@ -6,6 +6,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\User\CreateUserRequest;
@@ -40,11 +41,21 @@ class UserController extends Controller
 
     public function create()
     {
-        return Inertia::render('Backend/Users/Create');
+        $allRoles = Role::where('name', '!=', 'Super Admin') // UserController.php
+                        ->orderBy('name') // UserController.php
+                        ->pluck('name') // UserController.php
+                        ->toArray(); 
+        return Inertia::render('Backend/Users/Create',[
+            'allRoles' => $allRoles, // Pass all roles to the view
+        ]);
     }
 
     public function edit(User $user)
     {
+        $allRoles = Role::where('name', '!=', 'Super Admin') // UserController.php
+                        ->orderBy('name') // UserController.php
+                        ->pluck('name') // UserController.php
+                        ->toArray(); 
         return Inertia::render('Backend/Users/Edit', [
         'user' => [
             'id' => $user->id,
@@ -58,7 +69,8 @@ class UserController extends Controller
                                 ? Storage::disk('public')->url($user->default_image->image_url)
                                 : null,
             'roles' => $user->roles->pluck('name')->toArray(),
-        ]
+        ],
+        'allRoles' => $allRoles,
     ]);
     }
 

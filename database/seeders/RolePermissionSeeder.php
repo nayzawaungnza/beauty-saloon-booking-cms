@@ -38,6 +38,35 @@ class RolePermissionSeeder extends Seeder
             // Permission permissions
             'permission.view',
 
+            'branch.create',
+            'branch.view',
+            'branch.edit',
+            'branch.delete',
+            
+            // Timeslot permissions
+            'timeslot.create',
+            'timeslot.view',
+            'timeslot.edit',
+            'timeslot.delete',
+            
+            // Schedule permissions
+            'schedule.create',
+            'schedule.view',
+            'schedule.edit',
+            'schedule.delete',
+            
+            // Message permissions
+            'message.create',
+            'message.view',
+            'message.edit',
+            'message.delete',
+            
+            // Notification permissions
+            'notification.create',
+            'notification.view',
+            'notification.edit',
+            'notification.delete',
+
             //Activity Log permissions
             'activity_log.view',
             
@@ -179,6 +208,11 @@ class RolePermissionSeeder extends Seeder
         $user->givePermissionTo([
             'product.view',
             'user.view', // Allow users to view their own profile
+        ]);
+
+        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web']);
+        $manager->givePermissionTo([
+            'dashboard.view',
         ]);
 
          // ==================== SUPER ADMIN USER ====================

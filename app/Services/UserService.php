@@ -137,4 +137,8 @@ class UserService implements UserServiceInterface
     {
         return $this->userRepository->getSubscribers();
     }
+    public function getCustomers()
+    {
+        return $this->userRepository->getCustomers();
+    }
 }

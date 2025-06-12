@@ -170,7 +170,7 @@ class ServiceRepository extends BaseRepository
 
     public function getServices(){
         return $this->model->where('is_active',1)
-            ->with('createdBy', 'updatedBy', 'default_image', 'gallery_images')->orderBy('created_at', 'desc')->paginate(10);
+            ->with('createdBy', 'updatedBy', 'default_image', 'gallery_images')->orderBy('created_at', 'desc')->get();
     }
 
     public function getServiceBySlug(string $slug){

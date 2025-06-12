@@ -11,23 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('staff', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->string('email')->nullable()->unique(); // Staff email must be unique
+            $table->string('phone')->nullable()->unique();
             $table->string('slug')->unique();
+            $table->uuid('branch_id')->nullable();
+            $table->string('specialization')->nullable();
             $table->longText('description')->nullable();
             $table->text('excerpt')->nullable();
-            $table->integer('duration'); // Duration in minutes
-            $table->decimal('price', 8, 2); // Example: 8 total digits, 2 after decimal
-            $table->decimal('discount_price', 8, 2)->nullable();
-            $table->boolean('requires_buffer')->default(true);
             $table->boolean('is_active')->default(1);
-            $table->boolean('is_promotion')->default(false);
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
+            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
         
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('staff');
     }
 };

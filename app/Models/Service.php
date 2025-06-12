@@ -4,18 +4,22 @@ namespace App\Models;
 
 use App\Models\Image;
 use App\Traits\Uuids;
+use App\Models\Booking;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Service extends Model
 {
     use HasFactory, Notifiable, Uuids, SoftDeletes, HasSlug;
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'duration',
         'price',
@@ -26,6 +30,7 @@ class Service extends Model
         'is_active',
         'created_by',
         'updated_by',
+        'branch_id'
     ];
 
     protected $casts = [
@@ -54,16 +59,21 @@ class Service extends Model
             ->usingSeparator('-'); // Use underscore as separator
     }
 
-    // public function staff(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(Staff::class, 'staff_service');
-    // }
+    public function staff(): BelongsToMany
+    {
+        return $this->belongsToMany(Staff::class, 'staff_service');
+    }
 
-    //  // Relationship: A Service can be part of many Bookings
-    // public function bookings(): HasMany
-    // {
-    //     return $this->hasMany(Booking::class);
-    // }
+    // Relationship: A Service can be part of many Bookings
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function default_image()
     {

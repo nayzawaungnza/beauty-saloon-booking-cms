@@ -16,14 +16,14 @@ import '@/assets/css/layout-animations.css'
 
 createInertiaApp({
     title: (title) => `${title} - ${import.meta.env.VITE_APP_NAME || 'App'}`,
-    resolve: async (name) => {
-        console.log('Resolving page:', name); // Debug log
-        const page = await resolvePageComponent(
-            `./Pages/${name}.jsx`,
-            import.meta.glob('./Pages/**/*.jsx')
-        );
+    resolve: (name) => {
+        const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
+        let page = pages[`./Pages/${name}.jsx`];
 
-        // Normalize page name for comparison (e.g., Auth/Login -> auth/login)
+        if (!page) {
+            throw new Error(`Page component not found: ${name}. Looked for ./Pages/${name}.jsx`);
+        }
+
         const normalizedName = name.replace(/\//g, '/').toLowerCase();
         const publicPages = [
             'welcome',
@@ -36,9 +36,11 @@ createInertiaApp({
             'backend/auth/register'
         ];
 
-        page.default.layout = publicPages.includes(normalizedName)
-            ? (pageContent) => <GuestLayout>{pageContent}</GuestLayout>
-            : (pageContent) => <AuthenticatedLayoutWrapper>{pageContent}</AuthenticatedLayoutWrapper>;
+        page.default.layout = page.default.layout || (
+            publicPages.includes(normalizedName)
+                ? (pageContent) => <GuestLayout>{pageContent}</GuestLayout>
+                : (pageContent) => <AuthenticatedLayoutWrapper>{pageContent}</AuthenticatedLayoutWrapper>
+        );
 
         return page;
     },

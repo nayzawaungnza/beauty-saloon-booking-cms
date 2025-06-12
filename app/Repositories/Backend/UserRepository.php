@@ -254,6 +254,10 @@ class UserRepository extends BaseRepository
         return User::query()
             ->with(['roles'])->select('users.*')->get();
     }
+    public function getCustomers()
+    {
+        return $this->model()::query()->role('User')->get();
+    }
 
     public function getClientEloquent()
     {

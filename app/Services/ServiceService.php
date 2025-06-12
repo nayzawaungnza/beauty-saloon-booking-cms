@@ -81,4 +81,5 @@ class ServiceService implements ServiceServiceInterface
     public function getServiceEloquent(){
         return $this->serviceRepository->getServiceEloquent();
     }
+    
 }

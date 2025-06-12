@@ -3,288 +3,265 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { Link, usePage, router } from "@inertiajs/react"
 import { isEmpty } from "lodash"
-import TableContainer from "@/components/common/TableContainer"
-import Breadcrumbs from "@/components/common/Breadcrumb"
-import DeleteModal from "@/components/common/DeleteModal"
-import ActivateModal from "@/components/common/ActivateModal"
+import TableContainer from "@/components/common/TableContainer" // Index.jsx
+import Breadcrumbs from "@/components/common/Breadcrumb" // Index.jsx
+import DeleteModal from "@/components/common/DeleteModal" // Index.jsx
+import ActivateModal from "@/components/common/ActivateModal" // Index.jsx
 import {
   Col,
   Row,
   Card,
   UncontrolledTooltip,
   CardBody,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Badge, Button
+  Badge, Button // Index.jsx
 } from "reactstrap"
-import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
-//import { route } from "inertiajs"
+import { toast, ToastContainer } from "react-toastify" // Index.jsx
+import "react-toastify/dist/ReactToastify.css" // Index.jsx
 
 
-const Index = ({ users }) => {
-  document.title = "Users List | Admin Dashboard"
+const Index = ({ users }) => { // Index.jsx
+  document.title = "Users List | Admin Dashboard" // Index.jsx
 
-  const { flash } = usePage().props
-  const [user, setUser] = useState(null)
-  const [deleteModal, setDeleteModal] = useState(false)
-  const [activateModal, setActivateModal] = useState(false)
+  const { flash } = usePage().props // Index.jsx
+  const [user, setUser] = useState(null) // Index.jsx
+  const [deleteModal, setDeleteModal] = useState(false) // Index.jsx
+  const [activateModal, setActivateModal] = useState(false) // Index.jsx
 
-  
-
-  useEffect(() => {
-    if (flash.success) {
-      toast.success(flash.success)
+  useEffect(() => { // Index.jsx
+    if (flash.success) { // Index.jsx
+      toast.success(flash.success) // Index.jsx
     }
-    if (flash.error) {
-      toast.error(flash.error)
+    if (flash.error) { // Index.jsx
+      toast.error(flash.error) // Index.jsx
     }
-  }, [flash])
+  }, [flash]) // Index.jsx
 
-  const handleDeleteUser = () => {
-    if (user && user.id) {
-      router.delete(route("admin.users.destroy", user.id), {
-        onSuccess: () => {
-          setDeleteModal(false)
-          setUser(null)
-
-          //toast.success(flash.success)
+  const handleDeleteUser = () => { // Index.jsx
+    if (user && user.id) { // Index.jsx
+      // Backend check is primary, this proceeds if modal was shown
+      router.delete(route("admin.users.destroy", user.id), { // Index.jsx
+        onSuccess: () => { // Index.jsx
+          setDeleteModal(false) // Index.jsx
+          setUser(null) // Index.jsx
         },
-        onError: () => {
-          //toast.error(flash.error)
-        },
-      })
+      }) // Index.jsx
     }
   }
 
-  const handleActivateUser = () => {
-    if (user && user.id) {
-      const action = user.is_active ? "deactivate" : "activate"
-
-      router.patch(
-        route("admin.users.changeStatus", user.id),
-        {},
+  const handleActivateUser = () => { // Index.jsx
+    if (user && user.id) { // Index.jsx
+      // Backend check is primary
+      router.patch( // Index.jsx
+        route("admin.users.changeStatus", user.id), // Index.jsx
+        {}, // Index.jsx
         {
-          onSuccess: () => {
-            setActivateModal(false)
-            setUser(null)
-            toast.success(`User ${action}d successfully`)
-          },
-          onError: () => {
-            toast.error(`Failed to ${action} user`)
+          onSuccess: () => { // Index.jsx
+            setActivateModal(false) // Index.jsx
+            setUser(null) // Index.jsx
+            // Flash message from backend will be displayed by useEffect
           },
         },
-      )
+      ) // Index.jsx
     }
   }
 
-  const columns = useMemo(
+  const columns = useMemo( // Index.jsx
     () => [
       {
-        header: "Name",
-        accessorKey: "name",
-        enableColumnFilter: false,
-        enableSorting: true,
+        header: "Name", // Index.jsx
+        accessorKey: "name", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
       },
       {
-        header: "Email",
-        accessorKey: "email",
-        enableColumnFilter: false,
-        enableSorting: true,
+        header: "Email", // Index.jsx
+        accessorKey: "email", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
       },
       {
-        header: "Mobile",
-        accessorKey: "mobile",
-        enableColumnFilter: false,
-        enableSorting: true,
+        header: "Mobile", // Index.jsx
+        accessorKey: "mobile", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
       },
       {
-        header: "Status",
-        accessorKey: "is_active",
-        enableColumnFilter: false,
-        enableSorting: true,
-        cell: ({ row }) => (
-          <Badge className={row.original.is_active ? "bg-success" : "bg-danger"}>
-            {row.original.is_active ? "Active" : "Inactive"}
+        header: "Status", // Index.jsx
+        accessorKey: "is_active", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
+        cell: ({ row }) => ( // Index.jsx
+          <Badge className={row.original.is_active ? "bg-success" : "bg-danger"}> 
+            {row.original.is_active ? "Active" : "Inactive"} 
           </Badge>
         ),
       },
       {
-        header: "Role",
-        accessorKey: "roles",
-        enableColumnFilter: false,
-        enableSorting: true,
-        cell: ({ row }) => (
+        header: "Role", // Index.jsx
+        accessorKey: "roles", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
+        cell: ({ row }) => ( // Index.jsx
           <span>
-            {row.original.roles && row.original.roles.length > 0
-              ? row.original.roles.map((role) => role.name).join(", ")
-              : "None"}
+            {row.original.roles && row.original.roles.length > 0 // Index.jsx
+              ? row.original.roles.map((role) => role.name).join(", ") // Index.jsx
+              : "None"} 
           </span>
         ),
       },
-      // {
-      //   header: "BLK",
-      //   accessorKey: "is_blocked",
-      //   enableColumnFilter: false,
-      //   enableSorting: true,
-      //   cell: ({ row }) => (
-      //     <Button className={row.original.is_blocked ? "btn btn-sm btn-soft-danger" : "btn btn-sm btn-soft-success"} >
-      //       <i className={row.original.is_blocked ? "mdi mdi-account-check" : "mdi mdi-account-cancel"}>
-              
-      //       </i>
-      //       {/* {row.original.is_blocked ? "Blocked" : "Unblocked"} */}
-      //     </Button>
-      //   ),
-      // },
       {
-        header: "SUB",
-        accessorKey: "is_subscribed",
-        enableColumnFilter: false,
-        enableSorting: true,
-        cell: ({ row }) => (
-          <Button className={row.original.is_subscribed ? "btn btn-sm btn-soft-success" : "btn btn-sm btn-soft-danger"}>
-            <i className={row.original.is_subscribed ? "mdi mdi-bell-check" : "mdi mr-1 mdi-bell-cancel"}>
-              
+        header: "SUB", // Index.jsx
+        accessorKey: "is_subscribed", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: true, // Index.jsx
+        cell: ({ row }) => ( // Index.jsx
+          <Button className={row.original.is_subscribed ? "btn btn-sm btn-soft-success" : "btn btn-sm btn-soft-danger"}> 
+            <i className={row.original.is_subscribed ? "mdi mdi-bell-check" : "mdi mr-1 mdi-bell-cancel"}> 
             </i>
-            {/* {row.original.is_subscribed ? "Subscribed" : "Unsubscribed"} */}
           </Button>
         ),
       },
       {
-        header: "Action",
-        enableColumnFilter: false,
-        enableSorting: false,
-        cell: ({ row }) => (
-          <ul className="list-unstyled hstack gap-1 mb-0">
-            <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-              <Link
-                href={route("admin.users.show", row.original.id)}
-                className="btn btn-sm btn-soft-primary"
-                id={`viewtooltip-${row.original.id}`}
-              >
-                <i className="mdi mdi-eye-outline" />
-                <UncontrolledTooltip placement="top" target={`viewtooltip-${row.original.id}`} transition={{ timeout: 0 }}>
-                  View
-                </UncontrolledTooltip>
-              </Link>
-            </li>
+        header: "Action", // Index.jsx
+        enableColumnFilter: false, // Index.jsx
+        enableSorting: false, // Index.jsx
+        cell: ({ row }) => {
+          const userRoles = row.original.roles ? row.original.roles.map(role => role.name) : []; // Extract role names // Index.jsx
+          const isSuperAdmin = userRoles.includes('Super Admin'); // Index.jsx
 
-            <li>
-              <Link
-                href={route("admin.users.edit", row.original.id)}
-                className="btn btn-sm btn-soft-info"
-                id={`edittooltip-${row.original.id}`}
-              >
-                <i className="mdi mdi-pencil-outline" />
-                <UncontrolledTooltip placement="top" target={`edittooltip-${row.original.id}`} transition={{ timeout: 0 }}>
-                  Edit
-                </UncontrolledTooltip>
-              </Link>
-            </li>
+          return (
+            <ul className="list-unstyled hstack gap-1 mb-0"> 
+              <li data-bs-toggle="tooltip" data-bs-placement="top" title="View"> 
+                <Link
+                  href={route("admin.users.show", row.original.id)} // Index.jsx
+                  className="btn btn-sm btn-soft-primary" // Index.jsx
+                  id={`viewtooltip-${row.original.id}`} // Index.jsx
+                >
+                  <i className="mdi mdi-eye-outline" /> 
+                  <UncontrolledTooltip placement="top" target={`viewtooltip-${row.original.id}`} transition={{ timeout: 0 }}> 
+                    View
+                  </UncontrolledTooltip>
+                </Link>
+              </li>
 
-            <li>
-              <button
-                type="button"
-                className={row.original.is_active ? "btn btn-sm btn-soft-danger" : "btn btn-sm btn-soft-success"}
-                onClick={() => {
-                  setUser(row.original)
-                  setActivateModal(true)
-                }}
-                id={`activetooltip-${row.original.id}`}
-              >
-                <i className={row.original.is_active ? "mdi mdi-cancel" : "mdi mdi-check-circle"} />
-                <UncontrolledTooltip placement="top" target={`activetooltip-${row.original.id}`} transition={{ timeout: 0 }}>
-                  {row.original.is_active ? "Deactivate" : "Activate"}
-                </UncontrolledTooltip>
-              </button>
-            </li>
+              <li>
+                {isSuperAdmin ? (
+                  <Button
+                    size="sm"
+                    color="soft-info"
+                    disabled
+                    className="btn btn-sm btn-soft-info"
+                    id={`edittooltip-disabled-${row.original.id}`}
+                  >
+                    <i className="mdi mdi-pencil-outline" />
+                     <UncontrolledTooltip placement="top" target={`edittooltip-disabled-${row.original.id}`} transition={{ timeout: 0 }}>
+                      Cannot Edit Super Admin
+                    </UncontrolledTooltip>
+                  </Button>
+                ) : (
+                  <Link
+                    href={route("admin.users.edit", row.original.id)} // Index.jsx
+                    className="btn btn-sm btn-soft-info" // Index.jsx
+                    id={`edittooltip-${row.original.id}`} // Index.jsx
+                  >
+                    <i className="mdi mdi-pencil-outline" /> 
+                    <UncontrolledTooltip placement="top" target={`edittooltip-${row.original.id}`} transition={{ timeout: 0 }}> 
+                      Edit
+                    </UncontrolledTooltip>
+                  </Link>
+                )}
+              </li>
 
-            <li>
-              <button
-                type="button"
-                className="btn btn-sm btn-soft-danger"
-                onClick={() => {
-                  setUser(row.original)
-                  setDeleteModal(true)
-                }}
-                id={`deletetooltip-${row.original.id}`}
-              >
-                <i className="mdi mdi-delete-outline" />
-                <UncontrolledTooltip placement="top" target={`deletetooltip-${row.original.id}`} transition={{ timeout: 0 }}>
-                  Delete
-                </UncontrolledTooltip>
-              </button>
-            </li>
-          </ul>
-        ),
+              <li>
+                <button
+                  type="button"
+                  className={row.original.is_active ? "btn btn-sm btn-soft-danger" : "btn btn-sm btn-soft-success"} // Index.jsx
+                  onClick={() => { // Index.jsx
+                    if (!isSuperAdmin) { // Index.jsx
+                      setUser(row.original) // Index.jsx
+                      setActivateModal(true) // Index.jsx
+                    }
+                  }}
+                  disabled={isSuperAdmin} // Index.jsx
+                  id={`activetooltip-${row.original.id}`} // Index.jsx
+                >
+                  <i className={row.original.is_active ? "mdi mdi-cancel" : "mdi mdi-check-circle"} /> 
+                  <UncontrolledTooltip placement="top" target={`activetooltip-${row.original.id}`} transition={{ timeout: 0 }}> 
+                    {isSuperAdmin ? "Cannot change status" : (row.original.is_active ? "Deactivate" : "Activate")} 
+                  </UncontrolledTooltip>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-soft-danger" // Index.jsx
+                  onClick={() => { // Index.jsx
+                    if (!isSuperAdmin) { // Index.jsx
+                      setUser(row.original) // Index.jsx
+                      setDeleteModal(true) // Index.jsx
+                    }
+                  }}
+                  disabled={isSuperAdmin} // Index.jsx
+                  id={`deletetooltip-${row.original.id}`} // Index.jsx
+                >
+                  <i className="mdi mdi-delete-outline" /> 
+                  <UncontrolledTooltip placement="top" target={`deletetooltip-${row.original.id}`} transition={{ timeout: 0 }}> 
+                    {isSuperAdmin ? "Cannot Delete Super Admin" : "Delete"} 
+                  </UncontrolledTooltip>
+                </button>
+              </li>
+            </ul>
+          );
+        },
       },
     ],
-    [],
-  )
+    [], // Index.jsx
+  ) // Index.jsx
 
   return (
     <React.Fragment>
 
-      <DeleteModal show={deleteModal} onDeleteClick={handleDeleteUser} onCloseClick={() => setDeleteModal(false)} />
+      <DeleteModal show={deleteModal} onDeleteClick={handleDeleteUser} onCloseClick={() => setDeleteModal(false)} /> 
 
-      <ActivateModal
-        show={activateModal}
-        user={user}
-        onActivateClick={handleActivateUser}
-        onCloseClick={() => setActivateModal(false)}
+      <ActivateModal // Index.jsx
+        show={activateModal} // Index.jsx
+        user={user} // Index.jsx
+        onActivateClick={handleActivateUser} // Index.jsx
+        onCloseClick={() => setActivateModal(false)} // Index.jsx
       />
 
-      <div className="page-content">
-        <div className="container-fluid">
-          <Breadcrumbs title="Users" breadcrumbItem="Users List" />
-          <Row>
-            <Col lg="12">
-              <Card>
-                <CardBody className="border-bottom">
-                  <div className="d-flex align-items-center">
-                    <h5 className="mb-0 card-title flex-grow-1">Users List</h5>
-                    <div className="flex-shrink-0">
-                      <Link href={route("admin.users.create")} className="btn btn-primary me-1">
+      <div className="page-content"> 
+        <div className="container-fluid"> 
+          <Breadcrumbs title="Users" breadcrumbItem="Users List" /> 
+          <Row> 
+            <Col lg="12"> 
+              <Card> 
+                <CardBody className="border-bottom"> 
+                  <div className="d-flex align-items-center"> 
+                    <h5 className="mb-0 card-title flex-grow-1">Users List</h5> 
+                    <div className="flex-shrink-0"> 
+                      <Link href={route("admin.users.create")} className="btn btn-primary me-1"> 
                         Add New User
                       </Link>
-                      <button type="button" className="btn btn-light me-1" onClick={() => window.location.reload()}>
-                        <i className="mdi mdi-refresh"></i>
-                      </button>
-                      <UncontrolledDropdown className="dropdown d-inline-block me-1">
-                        <DropdownToggle type="menu" className="btn btn-success" id="dropdownMenuButton1">
-                          <i className="mdi mdi-dots-vertical"></i>
-                        </DropdownToggle>
-                        <DropdownMenu>
-                          <li>
-                            <DropdownItem href="#">Action</DropdownItem>
-                          </li>
-                          <li>
-                            <DropdownItem href="#">Another action</DropdownItem>
-                          </li>
-                          <li>
-                            <DropdownItem href="#">Something else here</DropdownItem>
-                          </li>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
+                      {/* ... other buttons ... */}
                     </div>
                   </div>
                 </CardBody>
-                <CardBody>
-                  {isEmpty(users) ? (
-                    <p>No users found.</p>
+                <CardBody> 
+                  {isEmpty(users) ? ( // Index.jsx
+                    <p>No users found.</p> // Index.jsx
                   ) : (
-                    <TableContainer
-                      columns={columns}
-                      data={users || []}
-                      isCustomPageSize={true}
-                      isGlobalFilter={true}
-                      isPagination={true}
-                      SearchPlaceholder="Search for users..."
-                      tableClass="align-middle table-nowrap dt-responsive nowrap w-100 table-check dataTable no-footer dtr-inline mt-4 border-top"
-                      pagination="pagination"
-                      paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded"
+                    <TableContainer // Index.jsx
+                      columns={columns} // Index.jsx
+                      data={users || []} // Index.jsx
+                      isCustomPageSize={true} // Index.jsx
+                      isGlobalFilter={true} // Index.jsx
+                      isPagination={true} // Index.jsx
+                      SearchPlaceholder="Search for users..." // Index.jsx
+                      tableClass="align-middle table-nowrap dt-responsive nowrap w-100 table-check dataTable no-footer dtr-inline mt-4 border-top" // Index.jsx
+                      pagination="pagination" // Index.jsx
+                      paginationWrapper="dataTables_paginate paging_simple_numbers pagination-rounded" // Index.jsx
                     />
                   )}
                 </CardBody>
@@ -293,9 +270,9 @@ const Index = ({ users }) => {
           </Row>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer /> 
     </React.Fragment>
   )
 }
 
-export default Index
+export default Index // Index.jsx
