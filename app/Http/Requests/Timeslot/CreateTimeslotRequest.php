@@ -15,7 +15,7 @@ class CreateTimeslotRequest extends FormRequest
     {
         return [
             'staff_id' => 'required|exists:staff,id',
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'nullable|exists:branches,id',
             'date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',

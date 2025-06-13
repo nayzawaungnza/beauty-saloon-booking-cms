@@ -5,7 +5,8 @@ import { Link, usePage, router } from "@inertiajs/react"
 import TableContainer from "@/components/common/TableContainer"
 import Breadcrumbs from "@/components/common/Breadcrumb"
 import DeleteModal from "@/components/common/DeleteModal"
-import { Col, Row, Card, UncontrolledTooltip, CardBody, Badge, Input, Button, Form, FormGroup, Label } from "reactstrap"
+import { Col, Row, Card, UncontrolledTooltip, CardBody, Badge, Input, Button, Form, FormGroup, Label, UncontrolledDropdown,
+DropdownToggle,DropdownMenu, DropdownItem } from "reactstrap"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -35,7 +36,7 @@ const Index = ({ schedules, staff, filters }) => {
         onSuccess: () => {
           setDeleteModal(false)
           setSchedule(null)
-          toast.success("Schedule deleted successfully!")
+          //toast.success("Schedule deleted successfully!")
         },
         onError: (errors) => {
           toast.error("Failed to delete schedule")
@@ -318,6 +319,54 @@ const Index = ({ schedules, staff, filters }) => {
           <Row>
             <Col lg="12">
               <Card>
+                <CardBody className="border-bottom">
+                                  <div className="d-flex align-items-center">
+                                    <h5 className="mb-0 card-title flex-grow-1">
+                                      <i className="mdi mdi-calendar me-2"></i>
+                                      Schedule Management
+                                    </h5>
+                                    <div className="flex-shrink-0">
+                                      <Link href="/admin/staff-schedules/create" className="btn btn-primary me-1">
+                                        <i className="mdi mdi-plus me-1"></i>
+                                        Add New Schedule
+                                      </Link>
+                                      <button
+                                        type="button"
+                                        className="btn btn-light me-1"
+                                        onClick={() => window.location.reload()}
+                                        title="Refresh"
+                                      >
+                                        <i className="mdi mdi-refresh"></i>
+                                      </button>
+                                      <UncontrolledDropdown className="dropdown d-inline-block me-1">
+                                        <DropdownToggle type="menu" className="btn btn-success" id="dropdownMenuButton1">
+                                          <i className="mdi mdi-dots-vertical"></i>
+                                        </DropdownToggle>
+                                        <DropdownMenu>
+                                          <li>
+                                            <DropdownItem href="#">
+                                              <i className="mdi mdi-file-excel me-2"></i>
+                                              Export CSV
+                                            </DropdownItem>
+                                          </li>
+                                          <li>
+                                            <DropdownItem href="#">
+                                              <i className="mdi mdi-file-pdf me-2"></i>
+                                              Export PDF
+                                            </DropdownItem>
+                                          </li>
+                                          <li>
+                                            <DropdownItem href="#">
+                                              <i className="mdi mdi-printer me-2"></i>
+                                              Print
+                                            </DropdownItem>
+                                          </li>
+                                        </DropdownMenu>
+                                      </UncontrolledDropdown>
+                                    </div>
+                                  </div>
+                                </CardBody>
+
                 <CardBody>
                   <TableContainer
                     columns={columns}
@@ -332,7 +381,7 @@ const Index = ({ schedules, staff, filters }) => {
                     SearchPlaceholder="Search schedules..."
                     isScheduleListFilter={false}
                     handleScheduleClick={() => {}}
-                    isAddButton={true}
+                    
                     addButtonLabel="Add Schedule"
                     addButtonLink="/admin/staff-schedules/create"
                   />

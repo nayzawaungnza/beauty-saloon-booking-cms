@@ -43,7 +43,7 @@ const Create = ({ staff, days }) => {
 
     router.post("/admin/staff-schedules", formData, {
       onSuccess: () => {
-        toast.success("Staff schedule created successfully!")
+        //toast.success("Staff schedule created successfully!")
         setIsSubmitting(false)
       },
       onError: (errors) => {

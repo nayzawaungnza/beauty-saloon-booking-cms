@@ -195,16 +195,24 @@ class BookingService implements BookingServiceInterface
 
     public function checkAvailability($branchId, $date, $startTime, $endTime, $staffId = null, $excludeBookingId = null)
     {
+        // Check if staff has a schedule for the given date
+        if ($staffId) {
+            $hasSchedule = $this->bookingRepository->hasSchedule($staffId, $date);
+            if (!$hasSchedule) {
+                return false;
+            }
+        }
+
         // Check if staff has conflicting bookings
         if ($staffId) {
             $hasStaffConflict = $this->bookingRepository->checkStaffConflict(
-                $staffId, 
-                $date, 
-                $startTime, 
-                $endTime, 
+                $staffId,
+                $date,
+                $startTime,
+                $endTime,
                 $excludeBookingId
             );
-            
+
             if ($hasStaffConflict) {
                 return false;
             }

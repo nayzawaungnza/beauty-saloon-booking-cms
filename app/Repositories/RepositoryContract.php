@@ -15,7 +15,6 @@ interface RepositoryContract
 
     public function createMultiple(array $data);
 
-    public function delete();
 
     public function deleteById($id);
 

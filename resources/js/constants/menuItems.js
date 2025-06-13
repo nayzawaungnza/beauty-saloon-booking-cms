@@ -101,7 +101,7 @@ export const menuItems = [
           {
             id: "bulk-staff-schedules",
             label: "Bulk Create",
-            link: "/admin/staff-schedules/bulk",
+            link: "/admin/staff-schedules/bulk-create",
             parentId: "staff-schedules",
           },
           // {
@@ -140,7 +140,26 @@ export const menuItems = [
       },
     ],
   },
-
+  {
+    id: "staff-leaves",
+    label: "Staff Leaves",
+    icon: "bx bx-calendar-event",
+    link: "/admin/staff-leaves",
+    subItems: [
+        {
+            id: "leaves-list",
+            label: "All Leaves",
+            link: "/admin/staff-leaves",
+            parentId: "staff-leaves",
+        },
+        {
+            id: "add-new-leave",
+            label: "Add New Leave",
+            link: "/admin/staff-leaves/create",
+            parentId: "staff-leaves",
+        },
+    ],
+  },
   {
     id: "services",
     label: "Services",

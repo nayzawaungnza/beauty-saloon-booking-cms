@@ -11,6 +11,10 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
+Route::get('/booking', [App\Http\Controllers\Frontend\BookingController::class, 'booking'])->name('booking');
+Route::post('/booking', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->name('booking.store');
+Route::get('/booking/available-timeslots', [App\Http\Controllers\Frontend\BookingController::class, 'getAvailableTimeslots'])->name('booking.available-timeslots');
+
 // Client Authenticated Routes
 Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
     Route::get('/dashboard', fn () => Inertia::render('Dashboard/index'))->name('dashboard');
@@ -52,8 +56,10 @@ Route::middleware(['auth', 'verified', 'role:Super Admin|Admin', 'check_user_act
     Route::resource('/roles', App\Http\Controllers\Backend\RoleController::class);
 
     // Staff Schedule routes
-    Route::resource('staff-schedules', App\Http\Controllers\Backend\StaffScheduleController::class);
+    Route::get('staff-schedules/bulk-create', [App\Http\Controllers\Backend\StaffScheduleController::class, 'bulkCreateForm'])->name('staff-schedules.bulk-create');
     Route::post('staff-schedules/bulk', [App\Http\Controllers\Backend\StaffScheduleController::class, 'bulkCreate'])->name('staff-schedules.bulk');
+    
+    Route::resource('staff-schedules', App\Http\Controllers\Backend\StaffScheduleController::class);
     
     // Timeslot routes
     Route::get('bulk-timeslots/create', [App\Http\Controllers\Backend\TimeslotController::class, 'bulkCreateForm'])->name('timeslots.bulk-create');
@@ -72,10 +78,18 @@ Route::middleware(['auth', 'verified', 'role:Super Admin|Admin', 'check_user_act
     Route::get('calendar', [App\Http\Controllers\Backend\CalendarController::class, 'index'])->name('calendar.index');
     Route::get('calendar/bookings', [App\Http\Controllers\Backend\CalendarController::class, 'getBookings'])->name('calendar.bookings');
     
+    // Staff Leave routes
+    Route::patch('staff-leaves/{staff_leave}/approve', [App\Http\Controllers\Backend\StaffLeaveController::class, 'approve'])->name('staff-leaves.approve');
+    Route::patch('staff-leaves/{staff_leave}/reject', [App\Http\Controllers\Backend\StaffLeaveController::class, 'reject'])->name('staff-leaves.reject');
+
+    Route::resource('staff-leaves', App\Http\Controllers\Backend\StaffLeaveController::class);
+    
     // Activity Log routes
     Route::get('activity-logs', [App\Http\Controllers\Backend\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::get('activity-logs/{activityLog}', [App\Http\Controllers\Backend\ActivityLogController::class, 'show'])->name('activity-logs.show');
     Route::get('activity-logs/export', [App\Http\Controllers\Backend\ActivityLogController::class, 'export'])->name('activity-logs.export');
 });
+
+Route::get('/pusher-test', [App\Http\Controllers\PusherTestController::class, 'triggerEvent']);
 
 require __DIR__.'/auth.php';

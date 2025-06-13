@@ -14,7 +14,7 @@ const BulkCreate = ({ staff, branches }) => {
   const { flash, errors } = usePage().props;
   const [formData, setFormData] = useState({
     staff_id: '',
-    branch_id: '',
+    //branch_id: '',
     start_date: '',
     end_date: '',
     interval: '30', // Default interval (minutes)
@@ -68,6 +68,7 @@ const BulkCreate = ({ staff, branches }) => {
         interval: parseInt(formData.interval),
       });
       setGeneratedSlots(response.data);
+      console.log(response.data);
     } catch (error) {
       toast.error('Error generating preview: ' + (error.response?.data?.error || error.message));
       setGeneratedSlots([]);
@@ -81,7 +82,7 @@ const BulkCreate = ({ staff, branches }) => {
     router.post('/admin/bulk-timeslots', {
       timeslots: generatedSlots.map((slot) => ({
         staff_id: formData.staff_id,
-        branch_id: formData.branch_id,
+        //branch_id: formData.branch_id,
         date: slot.date,
         start_time: slot.start_time,
         end_time: slot.end_time,
@@ -147,7 +148,7 @@ const BulkCreate = ({ staff, branches }) => {
                         </FormGroup>
                       </Col>
 
-                      <Col md="6">
+                      {/* <Col md="6">
                         <FormGroup className="mb-3">
                           <Label htmlFor="branch_id">
                             Branch <span className="text-danger">*</span>
@@ -169,7 +170,7 @@ const BulkCreate = ({ staff, branches }) => {
                           </Input>
                           {errors.branch_id && <FormFeedback>{errors.branch_id}</FormFeedback>}
                         </FormGroup>
-                      </Col>
+                      </Col> */}
                     </Row>
 
                     <Row>

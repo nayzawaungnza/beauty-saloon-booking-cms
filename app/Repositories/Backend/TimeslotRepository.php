@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Backend;
 
+use App\Models\Staff;
 use App\Models\Timeslot;
 
 use App\Repositories\BaseRepository;
@@ -46,9 +47,10 @@ class TimeslotRepository extends BaseRepository
 
     public function create(array $data)
     {
+        $branch_id = Staff::find($data['staff_id'])->branch_id;
         $timeslot = $this->model->create([
             'staff_id' => $data['staff_id'],
-            'branch_id' => $data['branch_id'],
+            'branch_id' => $branch_id,
             'date' => $data['date'],
             'start_time' => $data['start_time'],
             'end_time' => $data['end_time'],
@@ -76,9 +78,10 @@ class TimeslotRepository extends BaseRepository
 
     public function update(Timeslot $timeslot, array $data)
     {
+        $branch_id = Staff::find($data['staff_id'])->branch_id;
         $timeslot->update([
             'staff_id' => $data['staff_id'] ?? $timeslot->staff_id,
-            'branch_id' => $data['branch_id'] ?? $timeslot->branch_id,
+            'branch_id' => $branch_id ?? $timeslot->branch_id,
             'date' => $data['date'] ?? $timeslot->date,
             'start_time' => $data['start_time'] ?? $timeslot->start_time,
             'end_time' => $data['end_time'] ?? $timeslot->end_time,
@@ -151,5 +154,23 @@ class TimeslotRepository extends BaseRepository
             ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
             ->get();
+    }
+    public function hasConflict($staffId, $date, $startTime, $endTime, $excludeId = null)
+    {
+        $query = $this->model
+            ->where('staff_id', $staffId)
+            ->where('date', $date)
+            ->where(function ($q) use ($startTime, $endTime) {
+                $q->where(function ($q2) use ($startTime, $endTime) {
+                    $q2->where('start_time', '<', $endTime)
+                        ->where('end_time', '>', $startTime);
+                });
+            });
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
     }
 }

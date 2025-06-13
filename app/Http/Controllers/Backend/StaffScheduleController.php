@@ -181,6 +181,28 @@ class StaffScheduleController extends Controller
         }
     }
 
+    public function bulkCreateForm()
+    {
+        try {
+            $staff = $this->staffService->getActiveStaff();
+            
+            return Inertia::render('Backend/StaffSchedules/BulkCreate', [
+                'staff' => $staff,
+                'days' => [
+                    ['value' => 0, 'label' => 'Sunday'],
+                    ['value' => 1, 'label' => 'Monday'],
+                    ['value' => 2, 'label' => 'Tuesday'],
+                    ['value' => 3, 'label' => 'Wednesday'],
+                    ['value' => 4, 'label' => 'Thursday'],
+                    ['value' => 5, 'label' => 'Friday'],
+                    ['value' => 6, 'label' => 'Saturday'],
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to load bulk create form: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Bulk create staff schedules
      */

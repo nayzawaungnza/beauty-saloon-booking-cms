@@ -38,11 +38,14 @@ class StaffScheduleService implements StaffScheduleServiceInterface
     {
         DB::beginTransaction();
         try {
+            if ($this->staffScheduleRepository->hasConflict($data['staff_id'], $data['day_of_week'], $data['start_time'], $data['end_time'])) {
+                throw new InvalidArgumentException('Schedule conflicts with an existing schedule.');
+            }
             $schedule = $this->staffScheduleRepository->create($data);
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Staff Schedule Creation Error: ' . $exc->getMessage());
-            throw new InvalidArgumentException('Unable to create staff schedule');
+            throw new InvalidArgumentException($exc->getMessage());
         }
         DB::commit();
         return $schedule;
@@ -52,12 +55,14 @@ class StaffScheduleService implements StaffScheduleServiceInterface
     {
         DB::beginTransaction();
         try {
-            //$schedule = $this->getScheduleById($id);
-            $staffSchedule = $this->staffScheduleRepository->updateSchedule($staffSchedule, $data);
+            if ($this->staffScheduleRepository->hasConflict($data['staff_id'], $data['day_of_week'], $data['start_time'], $data['end_time'], $staffSchedule->id)) {
+                throw new InvalidArgumentException('Schedule conflicts with an existing schedule.');
+            }
+            $staffSchedule = $this->staffScheduleRepository->update($staffSchedule, $data);
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Staff Schedule Update Error: ' . $exc->getMessage());
-            throw new InvalidArgumentException('Unable to update staff schedule');
+            throw new InvalidArgumentException($exc->getMessage());
         }
         DB::commit();
         return $staffSchedule;
@@ -68,7 +73,7 @@ class StaffScheduleService implements StaffScheduleServiceInterface
         DB::beginTransaction();
         try {
             //$schedule = $this->getScheduleById($id);
-            $result = $this->staffScheduleRepository->delete($staffSchedule);
+            $result = $this->staffScheduleRepository->destroy($staffSchedule);
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Staff Schedule Deletion Error: ' . $exc->getMessage());
@@ -94,12 +99,15 @@ class StaffScheduleService implements StaffScheduleServiceInterface
         try {
             $schedules = [];
             foreach ($data['schedules'] as $scheduleData) {
-                $schedules[] = $this->staffScheduleRepository->createSchedule($scheduleData);
+                if ($this->staffScheduleRepository->hasConflict($scheduleData['staff_id'], $scheduleData['day_of_week'], $scheduleData['start_time'], $scheduleData['end_time'])) {
+                    throw new InvalidArgumentException('Schedule for ' . $scheduleData['day_of_week'] . ' conflicts with an existing schedule.');
+                }
+                $schedules[] = $this->staffScheduleRepository->create($scheduleData);
             }
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Bulk Staff Schedule Creation Error: ' . $exc->getMessage());
-            throw new InvalidArgumentException('Unable to create staff schedules in bulk');
+            throw new InvalidArgumentException($exc->getMessage());
         }
         DB::commit();
         return $schedules;

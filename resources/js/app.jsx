@@ -33,7 +33,8 @@ createInertiaApp({
             'auth/forgotpassword',
             'auth/resetpassword',
             'backend/auth/login',
-            'backend/auth/register'
+            'backend/auth/register',
+            'frontend/booking'
         ];
 
         page.default.layout = page.default.layout || (

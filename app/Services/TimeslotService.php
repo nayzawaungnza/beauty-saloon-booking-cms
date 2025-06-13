@@ -45,11 +45,14 @@ class TimeslotService implements TimeslotServiceInterface
     {
         DB::beginTransaction();
         try {
+            if ($this->timeslotRepository->hasConflict($data['staff_id'], $data['date'], $data['start_time'], $data['end_time'])) {
+                throw new InvalidArgumentException('Timeslot conflicts with an existing timeslot.');
+            }
             $timeslot = $this->timeslotRepository->create($data);
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Timeslot Creation Error: ' . $exc->getMessage());
-            throw new InvalidArgumentException('Unable to create timeslot');
+            throw new InvalidArgumentException($exc->getMessage());
         }
         DB::commit();
         return $timeslot;
@@ -59,12 +62,14 @@ class TimeslotService implements TimeslotServiceInterface
     {
         DB::beginTransaction();
         try {
-            //$timeslot = $this->getTimeslotById($id);
+            if ($this->timeslotRepository->hasConflict($data['staff_id'], $data['date'], $data['start_time'], $data['end_time'], $timeslot->id)) {
+                throw new InvalidArgumentException('Timeslot conflicts with an existing timeslot.');
+            }
             $timeslot = $this->timeslotRepository->update($timeslot, $data);
         } catch (Exception $exc) {
             DB::rollBack();
             Log::error('Timeslot Update Error: ' . $exc->getMessage());
-            throw new InvalidArgumentException('Unable to update timeslot');
+            throw new InvalidArgumentException($exc->getMessage());
         }
         DB::commit();
         return $timeslot;
@@ -122,6 +127,9 @@ class TimeslotService implements TimeslotServiceInterface
         try {
             $timeslots = [];
             foreach ($data['timeslots'] as $timeslotData) {
+                if ($this->timeslotRepository->hasConflict($timeslotData['staff_id'], $timeslotData['date'], $timeslotData['start_time'], $timeslotData['end_time'])) {
+                    throw new InvalidArgumentException('Timeslot for ' . $timeslotData['date'] . ' at ' . $timeslotData['start_time'] . ' conflicts with an existing timeslot.');
+                }
                 // Validate against staff schedule and leaves
                 $this->validateTimeslot($timeslotData);
                 $timeslots[] = $this->timeslotRepository->create($timeslotData);

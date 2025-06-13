@@ -110,55 +110,62 @@ class TimeslotController extends Controller
     {
         $request->validate([
             'staff_id' => 'required|exists:staff,id',
-            'date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => ['required', 'date', function ($attribute, $value, $fail) use ($request) {
+                if (Carbon::parse($value)->lt(Carbon::parse($request->start_date))) {
+                    $fail('The end date must be a date after or equal to the start date.');
+                }
+            }],
             'interval' => 'required|integer|in:15,30,45,60',
         ]);
 
         try {
             $staffId = $request->staff_id;
-            $date = Carbon::parse($request->date);
             $interval = (int) $request->interval;
-            $dayOfWeek = $date->dayOfWeekIso; // 1=Monday, 7=Sunday
+            $allTimeslots = [];
+            $startDate = Carbon::parse($request->start_date);
+            $endDate = Carbon::parse($request->end_date);
 
-            // Check if staff is on leave
-            $isOnLeave = StaffLeave::where('staff_id', $staffId)
-                ->where('status', 'approved')
-                ->where('start_date', '<=', $date)
-                ->where('end_date', '>=', $date)
-                ->exists();
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $dayOfWeek = $date->dayOfWeekIso;
 
-            if ($isOnLeave) {
-                return response()->json([], 200);
-            }
+                // $isOnLeave = StaffLeave::where('staff_id', $staffId)
+                //     ->where('status', 'approved')
+                //     ->whereDate('start_date', '<=', $date)
+                //     ->whereDate('end_date', '>=', $date)
+                //     ->exists();
 
-            // Get staff schedule
-            $schedule = StaffSchedule::where('staff_id', $staffId)
-                ->where('day_of_week', $dayOfWeek)
-                ->where('is_available', true)
-                ->first();
+                // if ($isOnLeave) {
+                //     continue;
+                // }
 
-            if (!$schedule) {
-                return response()->json([], 200);
-            }
+                $schedule = StaffSchedule::where('staff_id', $staffId)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->where('is_available', true)
+                    ->first();
 
-            // Generate timeslots
-            $startTime = Carbon::parse($schedule->start_time);
-            $endTime = Carbon::parse($schedule->end_time);
-            $timeslots = [];
-
-            while ($startTime->lessThan($endTime)) {
-                $slotEndTime = $startTime->copy()->addMinutes($interval);
-                if ($slotEndTime->greaterThan($endTime)) {
-                    break;
+                if (!$schedule) {
+                    continue;
                 }
-                $timeslots[] = [
-                    'start_time' => $startTime->format('H:i'),
-                    'end_time' => $slotEndTime->format('H:i'),
-                ];
-                $startTime = $slotEndTime;
+
+                $startTime = Carbon::parse($date->toDateString() . ' ' . $schedule->start_time);
+                $endTime = Carbon::parse($date->toDateString() . ' ' . $schedule->end_time);
+
+                while ($startTime->lessThan($endTime)) {
+                    $slotEndTime = $startTime->copy()->addMinutes($interval);
+                    if ($slotEndTime->greaterThan($endTime)) {
+                        break;
+                    }
+                    $allTimeslots[] = [
+                        'date' => $date->toDateString(),
+                        'start_time' => $startTime->format('H:i'),
+                        'end_time' => $slotEndTime->format('H:i'),
+                    ];
+                    $startTime = $slotEndTime;
+                }
             }
 
-            return response()->json($timeslots, 200);
+            return response()->json($allTimeslots, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to generate preview: ' . $e->getMessage()], 500);
         }
@@ -228,6 +235,7 @@ class TimeslotController extends Controller
         $staff = $this->staffService->getActiveStaff();
         $branches = $this->branchService->getActiveBranches();
         
+
         return Inertia::render('Backend/Timeslots/BulkCreate', [
             'staff' => $staff,
             'branches' => $branches
@@ -237,10 +245,19 @@ class TimeslotController extends Controller
     }
 }
 
-    public function bulkCreate(CreateTimeslotRequest $request)
+    public function bulkCreate(Request $request)
     {
+        $validatedData = $request->validate([
+            'timeslots' => 'required|array',
+            'timeslots.*.staff_id' => 'required|exists:staff,id',
+            'timeslots.*.date' => 'required|date',
+            'timeslots.*.start_time' => 'required|date_format:H:i',
+            'timeslots.*.end_time' => 'required|date_format:H:i|after:timeslots.*.start_time',
+            'timeslots.*.is_available' => 'required|boolean',
+        ]);
+
         try {
-            $timeslots = $this->timeslotService->bulkCreateTimeslots($request->validated());
+            $timeslots = $this->timeslotService->bulkCreateTimeslots($validatedData['timeslots']);
             
             return redirect()->route('admin.timeslots.index')
                 ->with('success', count($timeslots) . ' timeslots created successfully!');

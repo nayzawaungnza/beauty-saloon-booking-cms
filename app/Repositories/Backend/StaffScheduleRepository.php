@@ -92,12 +92,14 @@ class StaffScheduleRepository extends BaseRepository
         return $staffSchedule->fresh(['staff', 'createdBy', 'updatedBy']);
     }
 
+    public function delete(StaffSchedule $staffSchedule)
+    {
+        return $staffSchedule->delete();
+    }
+
     public function destroy(StaffSchedule $staffSchedule)
     {
-        $deleted = $this->deleteById($staffSchedule->id);
-        if ($deleted) {
-            $staffSchedule->save();
-        }
+        $this->deleteById($staffSchedule->id);
 
         // Log activity
         $activity_data['subject'] = $staffSchedule;
@@ -131,5 +133,23 @@ class StaffScheduleRepository extends BaseRepository
             ->with(['staff'])
             ->orderBy('start_time', 'asc')
             ->get();
+    }
+    public function hasConflict($staffId, $dayOfWeek, $startTime, $endTime, $excludeId = null)
+    {
+        $query = $this->model
+            ->where('staff_id', $staffId)
+            ->where('day_of_week', $dayOfWeek)
+            ->where(function ($q) use ($startTime, $endTime) {
+                $q->where(function ($q2) use ($startTime, $endTime) {
+                    $q2->where('start_time', '<', $endTime)
+                        ->where('end_time', '>', $startTime);
+                });
+            });
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
     }
 }

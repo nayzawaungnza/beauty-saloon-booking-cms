@@ -259,8 +259,8 @@ class BookingRepository extends BaseRepository
         $model_type = (class_basename(auth()->user()->getModel()) === config('constants.LABEL_NAME.USER'))
             ? 'User'
             : class_basename(auth()->user()->getModel());
-        $activity_data['description'] = sprintf('%s(%s) changed booking status from %s to %s for %s.', 
-            $model_type, 
+        $activity_data['description'] = sprintf('%s(%s) changed booking status from %s to %s for %s.',
+            $model_type,
             auth()->user()->name ?? 'System',
             $oldStatus,
             $status,
@@ -268,6 +268,18 @@ class BookingRepository extends BaseRepository
         );
         saveActivityLog($activity_data);
 
-        return $booking->fresh(['customer', 'staff', 'branch', 'timeslot', 'services']);
+        $freshBooking = $booking->fresh(['customer', 'staff', 'branch', 'timeslot', 'services']);
+
+        event(new \App\Events\BookingStatusUpdated($freshBooking));
+
+        return $freshBooking;
+    }
+
+    public function hasSchedule($staffId, $date)
+    {
+        return \App\Models\StaffSchedule::where('staff_id', $staffId)
+            ->where('day_of_week', Carbon::parse($date)->dayOfWeek)
+            ->where('is_available', true)
+            ->exists();
     }
 }
