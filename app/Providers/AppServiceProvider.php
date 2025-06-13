@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\Image;
 use App\Models\Service;
 
+use App\Models\Notification;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\Schema;
+use App\Observers\NotificationObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             
             
         ]);
+        Notification::observe(NotificationObserver::class);
         
     }
 }

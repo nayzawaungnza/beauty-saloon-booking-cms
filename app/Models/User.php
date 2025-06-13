@@ -28,6 +28,7 @@ class User extends Authenticatable
         'is_active',
         'is_blocked',
         'is_subscribed',
+        'is_guest',
         'created_by',
         'updated_by',
     ];

@@ -12,7 +12,10 @@ use App\Services\StaffService;
 use App\Services\BranchService;
 use App\Services\BookingService;
 use App\Services\ServiceService;
+use App\Events\BookingStatusUpdated;
 use App\Http\Controllers\Controller;
+use App\Events\BookingStatusUpdatedEvent;
+use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\Booking\CreateBookingRequest;
 use App\Http\Requests\Booking\UpdateBookingRequest;
 
@@ -206,8 +209,10 @@ class BookingController extends Controller
     public function confirm(Booking $booking)
     {
         try {
+            $previousStatus = $booking->status;
+
             $this->bookingService->confirmBooking($booking);
-            
+            $this->notifyStatusChange($booking, $previousStatus);
             return redirect()->back()
                 ->with('success', 'Booking confirmed successfully!');
         } catch (\Exception $e) {
@@ -219,8 +224,10 @@ class BookingController extends Controller
     public function cancel(Booking $booking)
     {
         try {
+            $previousStatus = $booking->status;
+
             $this->bookingService->cancelBooking($booking);
-            
+            $this->notifyStatusChange($booking, $previousStatus);
             return redirect()->back()
                 ->with('success', 'Booking cancelled successfully!');
         } catch (\Exception $e) {
@@ -232,8 +239,9 @@ class BookingController extends Controller
     public function complete(Booking $booking)
     {
         try {
+            $previousStatus = $booking->status;
             $this->bookingService->completeBooking($booking);
-            
+            $this->notifyStatusChange($booking, $previousStatus);
             return redirect()->back()
                 ->with('success', 'Booking completed successfully!');
         } catch (\Exception $e) {
@@ -297,6 +305,26 @@ class BookingController extends Controller
             return response()->json([
                 'error' => 'Error fetching available timeslots: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    protected function notifyStatusChange($booking, $previousStatus)
+    {
+        // Trigger real-time event
+        event(new BookingStatusUpdatedEvent($booking, $previousStatus));
+        
+        // Send notification to user if registered
+        if ($booking->customer) {
+            $booking->customer->notify(
+                new BookingStatusUpdated($booking, $previousStatus)
+            );
+        }
+        
+        // For guest bookings, send email notification
+        if (!$booking->customer_id && $booking->email) {
+            //use Illuminate\Support\Facades\Notification;
+            Notification::route('mail', $booking->email)
+                ->notify(new BookingStatusUpdated($booking, $previousStatus));
         }
     }
 }

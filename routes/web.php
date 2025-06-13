@@ -15,6 +15,9 @@ Route::get('/booking', [App\Http\Controllers\Frontend\BookingController::class, 
 Route::post('/booking', [App\Http\Controllers\Frontend\BookingController::class, 'store'])->name('booking.store');
 Route::get('/booking/available-timeslots', [App\Http\Controllers\Frontend\BookingController::class, 'getAvailableTimeslots'])->name('booking.available-timeslots');
 
+// Route::get('/booking/confirmation/{id}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
+// Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
+
 // Client Authenticated Routes
 Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
     Route::get('/dashboard', fn () => Inertia::render('Dashboard/index'))->name('dashboard');
@@ -84,6 +87,10 @@ Route::middleware(['auth', 'verified', 'role:Super Admin|Admin', 'check_user_act
 
     Route::resource('staff-leaves', App\Http\Controllers\Backend\StaffLeaveController::class);
     
+    Route::get('/notifications', [App\Http\Controllers\Backend\NotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\Backend\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\Backend\NotificationController::class, 'markAllAsRead']);
+
     // Activity Log routes
     Route::get('activity-logs', [App\Http\Controllers\Backend\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::get('activity-logs/{activityLog}', [App\Http\Controllers\Backend\ActivityLogController::class, 'show'])->name('activity-logs.show');

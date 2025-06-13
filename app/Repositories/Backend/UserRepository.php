@@ -48,6 +48,7 @@ class UserRepository extends BaseRepository
             //'avatar'    => $avatar ?? null,
             'is_blocked' => isset($data['is_blocked']) ? $data['is_blocked'] : 0,
             'is_subscribed' => isset($data['is_subscribed']) ? $data['is_subscribed'] : 0,
+            'is_guest' => isset($data['is_guest']) ? $data['is_guest'] : 0,
             'created_by' => auth()->user()->id ?? null,
             'remember_token'   => isset($data['remember_token']) ? $data['remember_token'] : null,
 

@@ -178,5 +178,10 @@
     "t-view-more":"View More",
     "t-my-wallet":"My Wallet",
     "t-t-settings":"Settings",
-    "t-logout":"Logout"
+    "t-logout":"Logout",
+    "New Booking from {{name}}": "New Booking from {{name}}",
+  "Mark all as read": "Mark all as read",
+  "Just now": "Just now",
+  "{{count}} min ago": "{{count}} min ago",
+  "{{count}} hours ago": "{{count}} hours ago"
 }
